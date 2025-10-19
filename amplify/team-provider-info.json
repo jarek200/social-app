@@ -2,13 +2,13 @@
   "sandbox": {
     "awscloudformation": {
       "AuthRoleName": "amplify-socialapp-sandbox-78075-authRole",
-      "UnauthRoleArn": "arn:aws:iam::801528680094:role/amplify-socialapp-sandbox-78075-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::801528680094:role/amplify-socialapp-sandbox-78075-authRole",
+      "UnauthRoleArn": "arn:aws:iam::459230935649:role/amplify-socialapp-sandbox-78075-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::459230935649:role/amplify-socialapp-sandbox-78075-authRole",
       "Region": "eu-west-2",
       "DeploymentBucketName": "amplify-socialapp-sandbox-78075-deployment",
       "UnauthRoleName": "amplify-socialapp-sandbox-78075-unauthRole",
       "StackName": "amplify-socialapp-sandbox-78075",
-      "StackId": "arn:aws:cloudformation:eu-west-2:801528680094:stack/amplify-socialapp-sandbox-78075/f3ccfcc0-ad28-11f0-bdda-0279ff0fe255",
+      "StackId": "arn:aws:cloudformation:eu-west-2:459230935649:stack/amplify-socialapp-sandbox-78075/f3ccfcc0-ad28-11f0-bdda-0279ff0fe255",
       "AmplifyAppId": "dpqj222y1t4u2"
     },
     "categories": {

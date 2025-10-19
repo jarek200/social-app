@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getFeedSnapshot } from "@stores/feed";
+import { AuthGuard } from "@components/AuthGuard";
 
 export async function getStaticPaths() {
   return getFeedSnapshot().map((item) => ({
@@ -13,7 +14,8 @@ const { item: _item } = Astro.props;
 ---
 
 <BaseLayout title={`Post · ${_item.authorName}`}>
-  <article class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+  <AuthGuard client:load>
+    <article class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
     <header class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p class="text-sm font-semibold text-slate-300">{_item.authorName}</p>
@@ -49,4 +51,5 @@ const { item: _item } = Astro.props;
       </div>
     </section>
   </article>
+  </AuthGuard>
 </BaseLayout>

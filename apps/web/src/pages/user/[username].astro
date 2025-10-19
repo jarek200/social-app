@@ -3,6 +3,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import { getPostsByAuthor } from "@stores/feed";
 import { findUserByUsername, listUsers } from "@stores/users";
 import { FollowButton } from "@components/FollowButton";
+import { AuthGuard } from "@components/AuthGuard";
 
 export async function getStaticPaths() {
   return listUsers().map((user) => ({
@@ -24,7 +25,8 @@ const _posts = getPostsByAuthor(profile.id);
 ---
 
 <BaseLayout title={`@${profile.username} profile`}>
-  <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+  <AuthGuard client:load>
+    <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
     <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="flex items-center gap-4">
         <img src={profile.avatarUrl} alt={profile.displayName} class="h-16 w-16 rounded-full object-cover" />
@@ -72,4 +74,5 @@ const _posts = getPostsByAuthor(profile.id);
       </ul>
     </section>
   </section>
+  </AuthGuard>
 </BaseLayout>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import ModerationPanel from "@components/ModerationPanel.astro";
+import { AuthGuard } from "@components/AuthGuard";
 import { isAdmin } from "@stores/users";
 
 const currentUserId = "user-2"; // Demo admin
@@ -11,7 +12,8 @@ if (!isAdmin(currentUserId)) {
 ---
 
 <BaseLayout title="Moderation Console">
-  <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+  <AuthGuard client:load>
+    <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
     <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold text-white">Moderation Console</h1>
@@ -56,4 +58,5 @@ if (!isAdmin(currentUserId)) {
       </ul>
     </section>
   </section>
+  </AuthGuard>
 </BaseLayout>

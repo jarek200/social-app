@@ -1,13 +1,15 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { NotificationPermissions } from "@components/NotificationPermissions";
+import { AuthGuard } from "@components/AuthGuard";
 import { getNotificationSnapshot } from "@stores/notifications";
 
 const _notifications = getNotificationSnapshot();
 ---
 
 <BaseLayout title="Notifications">
-  <section class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+  <AuthGuard client:load>
+    <section class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
     <header class="flex items-center justify-between">
       <div>
         <h1 class="text-xl font-semibold text-white">Notifications</h1>
@@ -36,4 +38,5 @@ const _notifications = getNotificationSnapshot();
   </section>
 
   <NotificationPermissions client:load />
+  </AuthGuard>
 </BaseLayout>

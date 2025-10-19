@@ -1,35 +1,38 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { AnalyticsDashboard } from "@components/AnalyticsDashboard";
+import { AuthGuard } from "@components/AuthGuard";
 ---
 
 <BaseLayout title="Analytics Dashboard">
-  <section class="space-y-6">
-    <header class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold text-white">Analytics Dashboard</h1>
-          <p class="text-sm text-slate-400">
-            Track engagement, user growth, and content performance metrics.
-          </p>
+  <AuthGuard client:load>
+    <section class="space-y-6">
+      <header class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-white">Analytics Dashboard</h1>
+            <p class="text-sm text-slate-400">
+              Track engagement, user growth, and content performance metrics.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200"
+              type="button"
+            >
+              Export Report
+            </button>
+            <button
+              class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
+              type="button"
+            >
+              Refresh Data
+            </button>
+          </div>
         </div>
-        <div class="flex gap-3">
-          <button
-            class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200"
-            type="button"
-          >
-            Export Report
-          </button>
-          <button
-            class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
-            type="button"
-          >
-            Refresh Data
-          </button>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <AnalyticsDashboard client:load />
-  </section>
+      <AnalyticsDashboard client:load />
+    </section>
+  </AuthGuard>
 </BaseLayout>

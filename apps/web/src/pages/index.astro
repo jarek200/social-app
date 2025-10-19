@@ -4,6 +4,7 @@ import ModerationPanel from "@components/ModerationPanel.astro";
 import DashboardSidebar from "@components/DashboardSidebar.astro";
 import { RealtimeControls } from "@components/RealtimeControls";
 import { FeedIsland } from "@components/FeedIsland";
+import { AuthGuard } from "@components/AuthGuard";
 import { getRealtimeMetrics } from "@services/analyticsService";
 import { getFeedSnapshot } from "@stores/feed";
 import { getAdmins, isAdmin, listUsers } from "@stores/users";
@@ -24,6 +25,7 @@ const _metrics = [
 ---
 
 <BaseLayout>
+<AuthGuard client:load>
   <section class="grid gap-4 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
     <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div>
@@ -118,4 +120,5 @@ const _metrics = [
 
     <DashboardSidebar />
   </section>
+</AuthGuard>
 </BaseLayout>
