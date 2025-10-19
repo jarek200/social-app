@@ -5,6 +5,7 @@ frontend:
       commands:
         - npm install -g pnpm
         - pnpm install
+        - cp apps/web/config.env apps/web/.env
     build:
       commands:
         - pnpm build
