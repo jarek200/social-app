@@ -1,19 +1,25 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": [
-      "astro/client"
-    ],
+    "types": ["astro/client", "vitest/globals", "@testing-library/jest-dom"],
     "baseUrl": ".",
     "paths": {
-      "@web/*": [
-        "src/*"
-      ]
+      "@web/*": ["src/*"],
+      "@components": ["src/components"],
+      "@components/*": ["src/components/*"],
+      "@pages": ["src/pages"],
+      "@pages/*": ["src/pages/*"],
+      "@stores": ["src/stores"],
+      "@stores/*": ["src/stores/*"],
+      "@utils": ["src/utils"],
+      "@utils/*": ["src/utils/*"],
+      "@layouts": ["src/layouts"],
+      "@layouts/*": ["src/layouts/*"],
+      "@config": ["src/config"],
+      "@config/*": ["src/config/*"],
+      "@services": ["src/services"],
+      "@services/*": ["src/services/*"]
     }
   },
-  "include": [
-    "src",
-    "astro.config.mjs",
-    "vitest.config.ts"
-  ]
+  "include": ["src", "astro.config.mjs", "vitest.config.ts"]
 }

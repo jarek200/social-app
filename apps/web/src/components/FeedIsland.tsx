@@ -1,7 +1,8 @@
 import { useStore } from "@nanostores/preact";
 import type { JSX } from "preact";
 import { useState } from "preact/hooks";
-import { addComment, feedStore, toggleLike } from "../stores/feed";
+import { addComment, filteredFeedStore, toggleLike } from "@stores/feed";
+import { Button, Badge } from "@components/ui";
 
 const formatTimeAgo = (isoDate: string) => {
   const elapsedMs = Date.now() - new Date(isoDate).getTime();
@@ -20,14 +21,14 @@ const formatTimeAgo = (isoDate: string) => {
   return `${days}d ago`;
 };
 
-const moderationBadgeClasses: Record<string, string> = {
+const _moderationBadgeClasses: Record<string, string> = {
   APPROVED: "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30",
   PENDING: "bg-amber-500/10 text-amber-300 border border-amber-500/30",
   REJECTED: "bg-rose-500/10 text-rose-300 border border-rose-500/30",
 };
 
 export function FeedIsland(): JSX.Element {
-  const feed = useStore(feedStore);
+  const feed = useStore(filteredFeedStore);
 
   return (
     <div class="grid gap-6">
@@ -41,11 +42,17 @@ export function FeedIsland(): JSX.Element {
               <p class="font-semibold text-white">{item.authorName}</p>
               <p class="text-sm text-slate-400">{formatTimeAgo(item.createdAt)}</p>
             </div>
-            <span
-              class={`rounded-full px-3 py-1 text-xs font-semibold ${moderationBadgeClasses[item.moderationStatus]}`}
+            <Badge
+              variant={
+                item.moderationStatus === "APPROVED"
+                  ? "success"
+                  : item.moderationStatus === "PENDING"
+                    ? "warning"
+                    : "danger"
+              }
             >
               {item.moderationStatus}
-            </span>
+            </Badge>
           </header>
           <div class="relative">
             <img
@@ -107,13 +114,9 @@ function CommentComposer({ postId }: ComposerProps): JSX.Element {
         value={draft}
         onInput={(event) => setDraft((event.target as HTMLInputElement).value)}
       />
-      <button
-        type="submit"
-        class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400 disabled:pointer-events-none disabled:opacity-50"
-        disabled={!draft.trim()}
-      >
+      <Button type="submit" disabled={!draft.trim()}>
         Post
-      </button>
+      </Button>
     </form>
   );
 }

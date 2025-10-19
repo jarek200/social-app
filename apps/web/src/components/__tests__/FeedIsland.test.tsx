@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/preact";
-import { FeedIsland } from "./FeedIsland";
-import { feedStore } from "../stores/feed";
+import { FeedIsland } from "../FeedIsland";
+import { feedStore } from "@stores/feed";
 
 describe("FeedIsland", () => {
   beforeEach(() => {
@@ -11,8 +11,8 @@ describe("FeedIsland", () => {
         id: "test-post",
         likes: 0,
         likedByViewer: false,
-        comments: []
-      }
+        comments: [],
+      },
     ]);
   });
 

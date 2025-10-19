@@ -1,11 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getFeedSnapshot } from "../../stores/feed";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getFeedSnapshot } from "@stores/feed";
 
 export async function getStaticPaths() {
   return getFeedSnapshot().map((item) => ({
     params: { id: item.id },
-    props: { item }
+    props: { item },
   }));
 }
 
@@ -38,22 +38,15 @@ const { item } = Astro.props;
       <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Comments</h2>
       <ul class="mt-3 space-y-3 text-sm text-slate-200">
         {item.comments.map((comment) => (
-          <li key={comment.id} class="rounded-xl bg-slate-900 px-3 py-2">
+          <li class="rounded-xl bg-slate-900 px-3 py-2">
             <span class="font-semibold text-white">{comment.authorName}</span> {comment.text}
           </li>
         ))}
         {item.comments.length === 0 && <li class="text-slate-400">No comments yet.</li>}
       </ul>
-      <form class="mt-4 grid gap-3 text-sm">
-        <textarea
-          rows="3"
-          placeholder="Add a comment..."
-          class="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-white focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-        ></textarea>
-        <button class="w-fit rounded-full bg-brand-500 px-4 py-2 font-semibold text-white transition hover:bg-brand-400">
-          Comment
-        </button>
-      </form>
+      <div class="mt-4 rounded-xl border border-dashed border-white/20 bg-slate-950/40 p-4 text-sm text-slate-400">
+        Comment submissions hook into AppSync mutations once the realtime backend is connected.
+      </div>
     </section>
   </article>
 </BaseLayout>

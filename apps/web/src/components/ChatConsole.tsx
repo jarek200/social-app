@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/preact";
 import { useMemo, useState } from "preact/hooks";
-import { chatChannelsStore, chatMessagesStore } from "../stores/chat";
+import { chatChannelsStore, chatMessagesStore } from "@stores/chat";
 
 export function ChatConsole() {
   const channels = useStore(chatChannelsStore);
@@ -9,7 +9,7 @@ export function ChatConsole() {
 
   const activeMessages = useMemo(
     () => messages.filter((message) => message.channelId === activeId),
-    [messages, activeId]
+    [messages, activeId],
   );
 
   return (
@@ -22,6 +22,7 @@ export function ChatConsole() {
             return (
               <li key={channel.id}>
                 <button
+                  type="button"
                   class={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition ${
                     isActive ? "bg-brand-500/20 text-brand-100" : "hover:bg-white/10"
                   }`}
@@ -50,14 +51,35 @@ export function ChatConsole() {
               {channels.find((channel) => channel.id === activeId)?.participants.join(", ")}
             </p>
           </div>
-          <button class="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+          <button
+            type="button"
+            class="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white transition hover:border-brand-400 hover:text-brand-200"
+            onClick={(e) => {
+              const button = e.target as HTMLButtonElement;
+              const originalText = button.textContent;
+              button.textContent = "Connecting...";
+              button.disabled = true;
+
+              setTimeout(() => {
+                button.textContent = "Call Started!";
+                button.classList.add("bg-emerald-500");
+                setTimeout(() => {
+                  button.textContent = originalText;
+                  button.disabled = false;
+                  button.classList.remove("bg-emerald-500");
+                }, 3000);
+              }, 2000);
+            }}
+          >
             Start call
           </button>
         </header>
 
         <div class="flex flex-col gap-3 overflow-y-auto px-4 py-4 text-sm text-slate-100">
           {activeMessages.length === 0 && (
-            <p class="text-center text-slate-500">No messages yet. Be the first to start the conversation.</p>
+            <p class="text-center text-slate-500">
+              No messages yet. Be the first to start the conversation.
+            </p>
           )}
           {activeMessages.map((message) => (
             <div key={message.id} class="max-w-lg rounded-2xl bg-white/10 px-4 py-2">

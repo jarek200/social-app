@@ -1,29 +1,49 @@
 ---
-const sections = [
+import { getRealtimeMetrics } from "@services/analyticsService";
+
+const realtimeMetrics = getRealtimeMetrics();
+
+const _sections = [
   {
     title: "Realtime Signals",
     metrics: [
-      { label: "Active viewers", value: "1,248", delta: "+12%" },
-      { label: "Live subscriptions", value: "342", delta: "+4%" }
-    ]
+      {
+        label: "Active viewers",
+        value: realtimeMetrics.activeViewers.toLocaleString(),
+        delta: "+12%",
+      },
+      {
+        label: "Live subscriptions",
+        value: realtimeMetrics.liveSubscriptions.toLocaleString(),
+        delta: "+4%",
+      },
+    ],
   },
   {
     title: "Workflow Status",
     metrics: [
-      { label: "Pending moderation", value: "5", delta: "2m avg" },
-      { label: "Step Fn throughput", value: "58/min", delta: "+8%" }
-    ]
-  }
+      {
+        label: "Pending moderation",
+        value: realtimeMetrics.pendingModeration.toString(),
+        delta: "2m avg",
+      },
+      {
+        label: "Step Fn throughput",
+        value: `${realtimeMetrics.stepFnThroughput}/min`,
+        delta: "+8%",
+      },
+    ],
+  },
 ];
 ---
 
 <aside class="grid gap-6" id="analytics">
-  {sections.map((section) => (
-    <section key={section.title} class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+  {_sections.map((section: any) => (
+    <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
       <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">{section.title}</h2>
       <ul class="mt-4 space-y-4">
-        {section.metrics.map((metric) => (
-          <li key={metric.label} class="flex items-center justify-between">
+        {section.metrics.map((metric: any) => (
+          <li class="flex items-center justify-between">
             <div>
               <p class="text-sm text-slate-400">{metric.label}</p>
               <p class="text-2xl font-bold text-white">{metric.value}</p>

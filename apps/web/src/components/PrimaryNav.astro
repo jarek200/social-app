@@ -1,5 +1,7 @@
 ---
-import { isAdmin } from "../stores/users";
+import { isAdmin } from "@stores/users";
+import { SearchBar } from "@components/SearchBar";
+import { LogoutButton } from "@components/LogoutButton";
 
 // Mock current user - in real app, get from auth context
 const currentUserId = "user-2"; // Noah is admin
@@ -11,12 +13,11 @@ const baseNavItems = [
   { label: "Create", href: "/create" },
   { label: "Notifications", href: "/notifications" },
   { label: "Chat", href: "/chat" },
-  { label: "Profile", href: "/profile/setup" }
+  { label: "Analytics", href: "/analytics" },
+  { label: "Profile", href: "/profile/setup" },
 ];
 
-const adminNavItems = [
-  { label: "Admin", href: "/admin/moderation" }
-];
+const adminNavItems = [{ label: "Admin", href: "/admin/moderation" }];
 
 const navItems = userIsAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
 
@@ -30,36 +31,47 @@ const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
       <div>
         <p class="text-sm font-semibold uppercase tracking-wide text-slate-400">Operations</p>
         <h1 class="text-xl font-bold text-white">Social Control Center</h1>
-        <p class="text-xs text-slate-500">Logged in as: <span class={`font-semibold ${userIsAdmin ? 'text-amber-400' : 'text-blue-400'}`}>{userIsAdmin ? 'Admin' : 'User'}</span></p>
+        <p class="text-xs text-slate-500">
+          Logged in as:
+          <span class={`font-semibold ${userIsAdmin ? "text-amber-400" : "text-blue-400"}`}>
+            {userIsAdmin ? "Admin" : "User"}
+          </span>
+        </p>
       </div>
     </div>
     <div class="flex items-center gap-3 text-sm">
-      <button class="rounded-full border border-white/20 px-4 py-2 font-medium text-white transition hover:border-brand-400 hover:text-brand-200">
+      <button class="rounded-full border border-white/20 px-4 py-2 font-medium text-white transition hover:border-brand-400 hover:text-brand-200" type="button">
         Deploy
       </button>
-      <button class="rounded-full bg-brand-500 px-4 py-2 font-semibold text-white transition hover:bg-brand-400">
+      <a href="/create" class="rounded-full bg-brand-500 px-4 py-2 font-semibold text-white transition hover:bg-brand-400">
         New Post
-      </button>
+      </a>
+      <LogoutButton client:load />
     </div>
   </div>
-  <nav class="mt-6 overflow-x-auto">
-    <ul class="flex items-center gap-2 text-sm text-slate-300">
-      {navItems.map((item) => {
-        const isRoot = item.href === "/";
-        const active = isRoot ? pathname === "/" : pathname.startsWith(item.href);
-        return (
-          <li key={item.href}>
-            <a
-              class={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium transition ${
-                active ? "bg-brand-500/20 text-brand-100" : "hover:bg-white/10"
-              }`}
-              href={item.href}
-            >
-              {item.label}
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-  </nav>
+  <div class="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <nav>
+      <ul class="flex items-center gap-2 text-sm text-slate-300">
+        {navItems.map((item) => {
+          const isRoot = item.href === "/";
+          const active = isRoot ? pathname === "/" : pathname.startsWith(item.href);
+          return (
+            <li>
+              <a
+                class={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium transition ${
+                  active ? "bg-brand-500/20 text-brand-100" : "hover:bg-white/10"
+                }`}
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+    <div class="w-full lg:w-80">
+      <SearchBar client:load />
+    </div>
+  </div>
 </div>

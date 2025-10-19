@@ -20,13 +20,14 @@
     "@aws-sdk/lib-dynamodb": "^3.554.0",
     "@aws-sdk/util-dynamodb": "^3.554.0",
     "@nanostores/preact": "^1.0.0",
+    "aws-amplify": "^6.15.7",
     "nanostores": "^0.10.0",
     "preact": "^10.20.1"
   },
   "devDependencies": {
     "@astrojs/preact": "^4.1.1",
     "@astrojs/tailwind": "^5.1.0",
-    "@biomejs/biome": "^1.8.3",
+    "@biomejs/biome": "^2.2.6",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/preact": "^2.0.1",
     "@types/node": "^20.11.30",

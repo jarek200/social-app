@@ -1,16 +1,19 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { listUsers, findUserByUsername } from "../../stores/users";
-import { getPostsByAuthor } from "../../stores/feed";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getPostsByAuthor } from "@stores/feed";
+import { listUsers, findUserByUsername } from "@stores/users";
+import { FollowButton } from "@components/FollowButton";
 
 export async function getStaticPaths() {
   return listUsers().map((user) => ({
     params: { username: user.username },
-    props: { username: user.username }
+    props: { username: user.username },
   }));
 }
 
 const { username } = Astro.props;
+const currentUserId = "user-2"; // Demo: Noah is logged in
+
 const profile = findUserByUsername(username);
 
 if (!profile) {
@@ -32,12 +35,10 @@ const posts = getPostsByAuthor(profile.id);
         </div>
       </div>
       <div class="flex gap-3">
-        <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+        <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200" type="button">
           Message
         </button>
-        <button class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400">
-          Follow
-        </button>
+        <FollowButton targetUserId={profile.id} currentUserId={currentUserId} client:load />
       </div>
     </header>
 
@@ -60,7 +61,7 @@ const posts = getPostsByAuthor(profile.id);
       <h2 class="text-lg font-semibold text-white">Recent posts</h2>
       <ul class="grid gap-4">
         {posts.map((post) => (
-          <li key={post.id} class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+          <li class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
             <a href={`/post/${post.id}`} class="text-white">
               <h3 class="text-sm font-semibold">{post.caption}</h3>
               <p class="text-xs text-slate-400">Likes: {post.likes} · Comments: {post.comments.length}</p>

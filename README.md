@@ -39,6 +39,8 @@ The web application runs on `http://localhost:4321` and uses mocked data until y
 | `amplify/functions` | Lambda invoked from AppSync to start workflows |
 | `infra/sam` | SAM stack for Step Functions + DynamoDB |
 | `infra/dynamodb` | Data modeling notes |
+| `docs/` | Project documentation and guides |
+| `config/` | Environment and configuration files |
 
 ## Backend Integration
 

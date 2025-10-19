@@ -1,6 +1,7 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { getNotificationSnapshot } from "../stores/notifications";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getNotificationSnapshot } from "@stores/notifications";
+import { NotificationPermissions } from "@components/NotificationPermissions";
 
 const notifications = getNotificationSnapshot();
 ---
@@ -33,4 +34,6 @@ const notifications = getNotificationSnapshot();
       ))}
     </ul>
   </section>
+
+  <NotificationPermissions client:load />
 </BaseLayout>

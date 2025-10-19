@@ -1,11 +1,12 @@
 ---
 import "../styles/global.css";
-import PrimaryNav from "../components/PrimaryNav.astro";
+import PrimaryNav from "@components/PrimaryNav.astro";
+import { AppInitializer } from "@components/AppInitializer";
 
 const {
   title = "Social App Prototype",
   description = "Real-time social photo sharing built on AWS serverless",
-  showNav = true
+  showNav = true,
 } = Astro.props;
 ---
 
@@ -21,6 +22,7 @@ const {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   </head>
   <body class="min-h-screen bg-slate-950 text-slate-100">
+    <AppInitializer client:load />
     <main class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12">
       {showNav && <PrimaryNav />}
       <slot />

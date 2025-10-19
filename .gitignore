@@ -21,3 +21,6 @@ tmp
 # OS
 .DS_Store
 Thumbs.db
+# Build artifacts
+apps/web/dist/
+apps/web/node_modules/

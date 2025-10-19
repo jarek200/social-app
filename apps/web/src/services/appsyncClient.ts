@@ -1,63 +1,164 @@
-import type { PostRecord } from "@social/shared";
-import { appsyncConfig, type AppSyncConfig } from "../config/appsync";
-
-type GraphQLRequest<TVariables> = {
-  query: string;
-  variables?: TVariables;
+import { generateClient } from 'aws-amplify/api';
+import { fetchAuthSession } from 'aws-amplify/auth';
+type PostRecord = {
+  id: string;
+  caption: string;
+  photoUrl: string;
+  moderationStatus: "PENDING" | "APPROVED" | "REJECTED";
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
+  owner: string;
+  feedId: string;
 };
 
-const GRAPHQL_ENDPOINT = appsyncConfig.graphqlEndpoint;
+// Create Amplify GraphQL client
+const client = generateClient();
 
+// Helper function to get auth headers
+async function getAuthHeaders() {
+  try {
+    const session = await fetchAuthSession();
+    return {
+      'Authorization': session.tokens?.idToken?.toString() || '',
+    };
+  } catch (error) {
+    console.warn("No auth session available:", error);
+    return {};
+  }
+}
+
+// Enhanced GraphQL client with auth
 async function callGraphQL<TData, TVariables = Record<string, unknown>>(
-  request: GraphQLRequest<TVariables>,
-  config: AppSyncConfig = appsyncConfig
+  query: string,
+  variables?: TVariables,
 ): Promise<TData> {
-  const response = await fetch(GRAPHQL_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      ...(config.apiKey ? { "x-api-key": config.apiKey } : {})
-    },
-    body: JSON.stringify(request)
-  });
+  try {
+    const result = await client.graphql({
+      query,
+      variables,
+      authMode: 'userPool',
+    });
 
-  if (!response.ok) {
-    const errorPayload = await response.text();
-    throw new Error(`AppSync request failed: ${response.status} ${errorPayload}`);
+    if (result.errors && result.errors.length > 0) {
+      throw new Error(`GraphQL errors: ${JSON.stringify(result.errors, null, 2)}`);
+    }
+
+    return result.data as TData;
+  } catch (error) {
+    console.error("GraphQL request failed:", error);
+    throw error;
   }
-
-  const payload = (await response.json()) as { data?: TData; errors?: unknown[] };
-  if (payload.errors?.length) {
-    throw new Error(JSON.stringify(payload.errors, null, 2));
-  }
-
-  if (!payload.data) {
-    throw new Error("AppSync returned no data");
-  }
-
-  return payload.data;
 }
 
 export const mutations = {
-  async savePost(input: { caption: string; photoStorageKey: string; photoUrl: string; feedId?: string }): Promise<string> {
-    const data = await callGraphQL<{ savePost: { postId: string } }>({
-      query: /* GraphQL */ `
+  async savePost(input: {
+    caption: string;
+    photoStorageKey: string;
+    photoUrl: string;
+    feedId?: string;
+  }): Promise<string> {
+    const data = await callGraphQL<{ savePost: { postId: string } }>(
+      /* GraphQL */ `
         mutation SavePost($input: SavePostInput!) {
           savePost(input: $input) {
             postId
           }
         }
       `,
-      variables: { input }
-    });
+      { input },
+    );
     return data.savePost.postId;
-  }
+  },
+
+  async createPost(input: {
+    caption: string;
+    photoStorageKey: string;
+    photoUrl: string;
+    feedId?: string;
+  }): Promise<PostRecord> {
+    const data = await callGraphQL<{ createPost: PostRecord }>(
+      /* GraphQL */ `
+        mutation CreatePost($input: CreatePostInput!) {
+          createPost(input: $input) {
+            id
+            caption
+            photoUrl
+            moderationStatus
+            likeCount
+            commentCount
+            createdAt
+            owner
+            feedId
+          }
+        }
+      `,
+      { input },
+    );
+    return data.createPost;
+  },
+
+  async createComment(input: {
+    postId: string;
+    body: string;
+  }): Promise<any> {
+    const data = await callGraphQL<{ createComment: any }>(
+      /* GraphQL */ `
+        mutation CreateComment($input: CreateCommentInput!) {
+          createComment(input: $input) {
+            id
+            body
+            createdAt
+            owner
+            postId
+          }
+        }
+      `,
+      { input },
+    );
+    return data.createComment;
+  },
+
+  async createLike(input: {
+    postId: string;
+  }): Promise<any> {
+    const data = await callGraphQL<{ createLike: any }>(
+      /* GraphQL */ `
+        mutation CreateLike($input: CreateLikeInput!) {
+          createLike(input: $input) {
+            id
+            postId
+            owner
+            createdAt
+          }
+        }
+      `,
+      { input },
+    );
+    return data.createLike;
+  },
+
+  async deleteLike(input: {
+    postId: string;
+  }): Promise<any> {
+    const data = await callGraphQL<{ deleteLike: any }>(
+      /* GraphQL */ `
+        mutation DeleteLike($input: DeleteLikeInput!) {
+          deleteLike(input: $input) {
+            id
+          }
+        }
+      `,
+      { input },
+    );
+    return data.deleteLike;
+  },
 };
 
 export const queries = {
   async listFeed(feedId: string): Promise<PostRecord[]> {
-    const data = await callGraphQL<{ listPostsByFeed: { items: PostRecord[] } }>({
-      query: /* GraphQL */ `
+    const data = await callGraphQL<{ listPostsByFeed: { items: PostRecord[] } }>(
+      /* GraphQL */ `
         query ListFeed($feedId: ID!, $sortDirection: ModelSortDirection) {
           listPostsByFeed(feedId: $feedId, sortDirection: $sortDirection, limit: 20) {
             items {
@@ -74,9 +175,93 @@ export const queries = {
           }
         }
       `,
-      variables: { feedId, sortDirection: "DESC" }
-    });
+      { feedId, sortDirection: "DESC" },
+    );
 
     return data.listPostsByFeed.items;
-  }
+  },
+
+  async getPost(id: string): Promise<PostRecord> {
+    const data = await callGraphQL<{ getPost: PostRecord }>(
+      /* GraphQL */ `
+        query GetPost($id: ID!) {
+          getPost(id: $id) {
+            id
+            caption
+            photoUrl
+            moderationStatus
+            likeCount
+            commentCount
+            createdAt
+            owner
+            feedId
+          }
+        }
+      `,
+      { id },
+    );
+    return data.getPost;
+  },
+
+  async listCommentsForPost(postId: string): Promise<any[]> {
+    const data = await callGraphQL<{ listCommentsForPost: { items: any[] } }>(
+      /* GraphQL */ `
+        query ListCommentsForPost($postId: ID!) {
+          listCommentsForPost(postId: $postId) {
+            items {
+              id
+              body
+              createdAt
+              owner
+              postId
+            }
+          }
+        }
+      `,
+      { postId },
+    );
+    return data.listCommentsForPost.items;
+  },
+
+  async myProfile(): Promise<any> {
+    const data = await callGraphQL<{ myProfile: any }>(
+      /* GraphQL */ `
+        query MyProfile {
+          myProfile {
+            id
+            handle
+            displayName
+            avatarUrl
+            bio
+            createdAt
+            updatedAt
+          }
+        }
+      `,
+    );
+    return data.myProfile;
+  },
+};
+
+// Real-time subscriptions
+export const subscriptions = {
+  onFeedEvent(feedId: string, callback: (data: any) => void) {
+    return client.graphql({
+      query: /* GraphQL */ `
+        subscription OnFeedEvent($feedId: ID!) {
+          onFeedEvent(feedId: $feedId) {
+            postId
+            type
+            payload
+            createdAt
+          }
+        }
+      `,
+      variables: { feedId },
+      authMode: 'userPool',
+    }).subscribe({
+      next: (data: any) => callback(data),
+      error: (error: any) => console.error('Subscription error:', error),
+    });
+  },
 };

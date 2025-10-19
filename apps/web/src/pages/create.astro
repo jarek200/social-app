@@ -1,47 +1,16 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { CreatePostForm } from "@components/CreatePostForm";
 ---
 
 <BaseLayout title="Create Post">
   <section class="rounded-3xl border border-white/10 bg-slate-900/60 p-8">
     <header class="mb-6">
       <h1 class="text-2xl font-semibold text-white">Create a Post</h1>
-      <p class="text-sm text-slate-400">Uploads use Amplify Storage pre-signed URLs and trigger moderation workflows.</p>
+      <p class="text-sm text-slate-400">
+        Uploads use Amplify Storage pre-signed URLs and trigger moderation workflows.
+      </p>
     </header>
-    <form class="grid gap-5 lg:grid-cols-2">
-      <div class="grid gap-3">
-        <label class="grid gap-2 text-sm">
-          <span>Caption</span>
-          <textarea
-            rows="5"
-            placeholder="Share what's happening..."
-            class="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-white focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-          ></textarea>
-        </label>
-        <label class="grid gap-2 text-sm">
-          <span>Attach photo</span>
-          <div class="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/40 bg-slate-950/40 p-6 text-slate-300">
-            <span class="text-sm">Drag and drop or browse</span>
-            <input type="file" class="text-xs" />
-          </div>
-        </label>
-        <label class="flex items-center gap-2 text-sm text-slate-300">
-          <input type="checkbox" class="h-4 w-4 rounded border-white/20 bg-slate-900" checked />
-          Notify followers via SNS
-        </label>
-      </div>
-      <aside class="grid gap-4 rounded-2xl border border-white/10 bg-slate-900/70 p-6 text-sm text-slate-300">
-        <p class="font-semibold text-white">Workflow preview</p>
-        <ol class="grid gap-3">
-          <li>1. Upload file to S3 via Amplify</li>
-          <li>2. Trigger `savePost` mutation (AppSync)</li>
-          <li>3. Step Functions Express handles moderation</li>
-          <li>4. Approved post updates DynamoDB + feed subscription</li>
-        </ol>
-        <button class="rounded-full bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-400">
-          Submit
-        </button>
-      </aside>
-    </form>
+    <CreatePostForm client:load />
   </section>
 </BaseLayout>
