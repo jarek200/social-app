@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ModerationPanel from "../../components/ModerationPanel.astro";
+import { isAdmin } from "../../stores/users";
+
+// Mock current user - in real app, get from auth context
+const currentUserId = "user-2"; // Noah is admin
+
+if (!isAdmin(currentUserId)) {
+  // Redirect to home or show access denied
+  throw new Error("Access denied: Admin privileges required");
+}
+---
+
+<BaseLayout title="Moderation Console">
+  <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+    <header class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold text-white">Moderation Console</h1>
+        <p class="text-sm text-slate-400">Review flagged content and manage escalation workflows.</p>
+      </div>
+      <div class="flex gap-3 text-xs">
+        <button class="rounded-full border border-white/20 px-4 py-2 font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+          Assign reviewer
+        </button>
+        <button class="rounded-full bg-brand-500 px-4 py-2 font-semibold text-white transition hover:bg-brand-400">
+          Auto resolve
+        </button>
+      </div>
+    </header>
+
+    <ModerationPanel />
+
+    <section class="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-400">Escalation Rules</h2>
+      <ul class="mt-4 space-y-3 text-sm text-slate-200">
+        <li class="flex items-start justify-between gap-4 rounded-xl bg-white/5 px-4 py-3">
+          <div>
+            <p class="font-semibold text-white">AI policy violation</p>
+            <p class="text-xs text-slate-400">Comprehend score &gt;= 0.7 triggers SNS alert to #moderators.</p>
+          </div>
+          <span class="rounded-full bg-rose-500/20 px-3 py-1 text-xs font-semibold text-rose-200">High</span>
+        </li>
+        <li class="flex items-start justify-between gap-4 rounded-xl bg-white/5 px-4 py-3">
+          <div>
+            <p class="font-semibold text-white">Image moderation pending</p>
+            <p class="text-xs text-slate-400">Rekognition follow-up job kicks off Step Functions human review.</p>
+          </div>
+          <span class="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-200">Medium</span>
+        </li>
+        <li class="flex items-start justify-between gap-4 rounded-xl bg-white/5 px-4 py-3">
+          <div>
+            <p class="font-semibold text-white">Auto-approved</p>
+            <p class="text-xs text-slate-400">Low-risk captions exit workflow with no manual review.</p>
+          </div>
+          <span class="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-200">Low</span>
+        </li>
+      </ul>
+    </section>
+  </section>
+</BaseLayout>

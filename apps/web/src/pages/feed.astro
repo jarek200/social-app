@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { FeedIsland } from "../components/FeedIsland";
+---
+
+<BaseLayout title="Feed">
+  <section class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-semibold text-white">Feed</h1>
+        <p class="text-sm text-slate-400">Real-time updates from creators you follow.</p>
+      </div>
+      <div class="flex gap-2 text-xs">
+        <button class="rounded-full border border-white/20 px-3 py-2 font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+          Global
+        </button>
+        <button class="rounded-full border border-white/20 px-3 py-2 font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+          Following
+        </button>
+      </div>
+    </header>
+    <div class="mt-6">
+      <FeedIsland client:load />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,43 @@
+{
+  "name": "social-app-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.17",
+    "pnpm": ">=8"
+  },
+  "scripts": {
+    "dev": "nx serve web",
+    "build": "nx build web",
+    "lint": "nx lint web",
+    "test": "nx test web",
+    "check": "nx format:check && pnpm run lint && pnpm run test",
+    "format": "nx format:write"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.554.0",
+    "@aws-sdk/client-sfn": "^3.554.0",
+    "@aws-sdk/lib-dynamodb": "^3.554.0",
+    "@aws-sdk/util-dynamodb": "^3.554.0",
+    "@nanostores/preact": "^1.0.0",
+    "nanostores": "^0.10.0",
+    "preact": "^10.20.1"
+  },
+  "devDependencies": {
+    "@astrojs/preact": "^4.1.1",
+    "@astrojs/tailwind": "^5.1.0",
+    "@biomejs/biome": "^1.8.3",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/preact": "^2.0.1",
+    "@types/node": "^20.11.30",
+    "@vitest/coverage-v8": "^1.5.3",
+    "astro": "^4.6.2",
+    "autoprefixer": "^10.4.19",
+    "jsdom": "^27.0.1",
+    "nx": "^18.2.4",
+    "tailwindcss": "^3.4.3",
+    "tsx": "^3.13.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.3"
+  }
+}

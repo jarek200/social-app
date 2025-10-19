@@ -1,0 +1,123 @@
+type User @model(subscriptions: null) @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  handle: String!
+  displayName: String!
+  avatarUrl: AWSURL
+  bio: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  posts(limit: Int, nextToken: String): ModelPostConnection
+}
+
+type Post
+  @model
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, update, delete, read] }
+      { allow: groups, groups: ["Moderators"], operations: [read, update] }
+      { allow: private, operations: [read] }
+    ]
+  )
+  @key(name: "byCreatedAt", fields: ["owner", "createdAt"], queryField: "listPostsByOwner")
+  @key(name: "byFeed", fields: ["feedId", "createdAt"], queryField: "listPostsByFeed")
+{
+  id: ID!
+  owner: ID!
+  feedId: ID! @default(value: "GLOBAL")
+  caption: String!
+  photoStorageKey: String!
+  photoUrl: AWSURL!
+  moderationStatus: ModerationStatus!
+  moderationReason: String
+  likeCount: Int!
+  commentCount: Int!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  comments(limit: Int, nextToken: String): ModelCommentConnection
+}
+
+type Comment
+  @model(subscriptions: null)
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, update, delete, read] }
+      { allow: private, operations: [read] }
+    ]
+  )
+  @key(name: "byPost", fields: ["postId", "createdAt"], queryField: "listCommentsForPost")
+{
+  id: ID!
+  postId: ID!
+  owner: ID!
+  body: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Like
+  @model(queries: null, subscriptions: null)
+  @auth(
+    rules: [
+      { allow: owner, operations: [create, delete, read] }
+      { allow: private, operations: [read] }
+    ]
+  )
+  @key(name: "byPost", fields: ["postId", "owner"])
+{
+  id: ID!
+  postId: ID!
+  owner: ID!
+  createdAt: AWSDateTime!
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+type FeedEvent @aws_subscribe(mutations: ["publishFeedEvent"]) {
+  postId: ID!
+  type: FeedEventType!
+  payload: AWSJSON!
+  createdAt: AWSDateTime!
+}
+
+enum FeedEventType {
+  POST_CREATED
+  POST_UPDATED
+  MODERATION_UPDATED
+  COMMENT_CREATED
+  LIKE_UPDATED
+}
+
+type Mutation {
+  publishFeedEvent(postId: ID!, type: FeedEventType!, payload: AWSJSON!): FeedEvent @aws_auth(cognito_groups: ["Moderators"])
+  savePost(input: SavePostInput!): SavePostResult!
+    @aws_cognito_user_pools
+    @aws_iam
+    @function(name: "SavePostWorkflowTrigger")
+}
+
+input SavePostInput {
+  caption: String!
+  photoStorageKey: String!
+  photoUrl: AWSURL!
+  feedId: ID
+}
+
+type Query {
+  myProfile: User @aws_cognito_user_pools
+}
+
+type SavePostResult {
+  postId: ID!
+  status: String!
+  submittedAt: AWSDateTime!
+}
+
+type Subscription {
+  onFeedEvent(feedId: ID!): FeedEvent @aws_subscribe(mutations: ["publishFeedEvent"])
+    @aws_cognito_user_pools
+    @aws_iam
+}

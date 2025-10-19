@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless backend for the Social App Prototype
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 15
+    MemorySize: 256
+    Tracing: Active
+    Handler: index.handler
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref SocialAppTable
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
+
+Parameters:
+  AppSyncApiId:
+    Type: String
+    Description: Existing Amplify-managed AppSync API ID
+
+Resources:
+  SocialAppTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Sub "${AWS::StackName}-social-app"
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  SavePostWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-save-post"
+      Type: EXPRESS
+      DefinitionUri: state_machines/save_post.asl.json
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SocialAppTable
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: !Ref FeedEventsTopic
+            - Effect: Allow
+              Action:
+                - comprehend:DetectSentiment
+                - comprehend:DetectModerationLabels
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - appSync:GraphQL
+              Resource:
+                - !Sub "arn:aws:appsync:${AWS::Region}:${AWS::AccountId}:apis/${AppSyncApiId}/*"
+
+  FeedEventsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: SocialAppFeedEvents
+      TopicName: !Sub "${AWS::StackName}-feed-events"
+
+  SavePostWorkflowTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-save-post-trigger"
+      CodeUri: ../../amplify/functions/save-post-workflow
+      Environment:
+        Variables:
+          SAVE_POST_STATE_MACHINE_ARN: !Ref SavePostWorkflow
+          FEED_TOPIC_ARN: !Ref FeedEventsTopic
+          APPSYNC_API_ID: !Ref AppSyncApiId
+      Policies:
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt SavePostWorkflow.Name
+
+Outputs:
+  DynamoTableName:
+    Value: !Ref SocialAppTable
+  SavePostStateMachineArn:
+    Value: !Ref SavePostWorkflow
+  FeedEventsTopicArn:
+    Value: !Ref FeedEventsTopic

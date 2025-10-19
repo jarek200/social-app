@@ -1,0 +1,42 @@
+---
+title: Architecture Overview
+layout: ../../layouts/BaseLayout.astro
+---
+
+# Architecture Overview
+
+This prototype demonstrates a hybrid approach that pairs **Amplify managed services** with **SAM-managed workflows**:
+
+- Amplify handles Cognito auth, AppSync GraphQL, S3 storage, and hosting.
+- SAM provisions a DynamoDB single-table, Step Functions Express workflows, and SNS fan-out.
+- The frontend consumes AppSync with real-time subscriptions and optimistic UI driven by Nanostores.
+
+## Request Flow
+
+1. User uploads photo + caption via the Astro UI.
+2. AppSync mutation triggers the `SavePostWorkflowTrigger` Lambda (`amplify/functions/save-post-workflow`).
+3. Lambda starts the Express Step Function (`infra/sam/state_machines/save_post.asl.json`).
+4. DynamoDB writes the post as `PENDING`; Comprehend analyzes sentiment.
+5. Workflow transitions to `APPROVED`/`REJECTED`, publishes SNS events, and notifies AppSync.
+6. AppSync subscription broadcasts the update to all connected clients.
+
+## Technology Stack
+
+| Layer | Tech | Purpose |
+| --- | --- | --- |
+| Frontend | Astro, Preact, Nanostores | Realtime feed, optimistic interactions |
+| Identity | Cognito (Amplify Auth) | User pools + JWT tokens |
+| API | AppSync GraphQL (`schema.graphql`) | Queries, mutations, subscriptions |
+| Data | DynamoDB (`infra/dynamodb`) | Single-table PK/SK design |
+| Workflow | Step Functions Express | Moderation, fan-out, notifications |
+| AI | Amazon Comprehend | Caption moderation & sentiment |
+| Messaging | SNS + EventBridge (optional) | Notify followers/external systems |
+| DevEx | Nx, Biome, Vitest | Monorepo tooling, lint, tests |
+
+## Environments
+
+- `dev` – Local + sandboxed AWS account (aggressive logging)
+- `staging` – Feature previews via Amplify Preview URLs
+- `prod` – Amplify-hosted CDN with custom domain & WAF
+
+For deployment steps, head to [/docs/deploy](/docs/deploy).

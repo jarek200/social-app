@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout showNav={false} title="Sign in">
+  <section class="mx-auto w-full max-w-md rounded-3xl border border-white/10 bg-slate-900/70 p-8 text-slate-100">
+    <div class="mb-6 text-center">
+      <p class="text-sm font-semibold uppercase tracking-wide text-slate-400">Access</p>
+      <h1 class="text-2xl font-bold text-white">Sign in to Social Ops</h1>
+    </div>
+    <form class="grid gap-4">
+      <label class="grid gap-2 text-sm">
+        <span>Email</span>
+        <input
+          type="email"
+          placeholder="you@example.com"
+          class="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-white focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+        />
+      </label>
+      <label class="grid gap-2 text-sm">
+        <span>Password</span>
+        <input
+          type="password"
+          placeholder="••••••••"
+          class="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-white focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+        />
+      </label>
+      <button type="submit" class="rounded-full bg-brand-500 py-2 font-semibold text-white transition hover:bg-brand-400">
+        Continue
+      </button>
+    </form>
+    <div class="mt-6 grid gap-3 text-sm">
+      <button class="rounded-full border border-white/20 py-2 font-medium text-white transition hover:border-brand-400 hover:text-brand-200">
+        Sign in with Google
+      </button>
+      <button class="rounded-full border border-white/20 py-2 font-medium text-white transition hover:border-brand-400 hover:text-brand-200">
+        Sign in with Apple
+      </button>
+    </div>
+    <p class="mt-6 text-center text-xs text-slate-500">
+      Cognito Hosted UI or Amplify Auth components plug in here.
+    </p>
+  </section>
+</BaseLayout>

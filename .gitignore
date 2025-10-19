@@ -1,0 +1,23 @@
+# Node
+node_modules
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+npm-debug.log*
+
+# Nx cache/output
+dist
+.nx
+tmp
+
+# Logs
+*.log
+*.csv
+
+# Env files
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db

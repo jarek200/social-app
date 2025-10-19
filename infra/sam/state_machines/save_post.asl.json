@@ -1,0 +1,171 @@
+{
+  "Comment": "Moderate and persist social posts before publishing to feeds",
+  "StartAt": "PersistPostPending",
+  "States": {
+    "PersistPostPending": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName.$": "$$.Execution.Input.config.dynamoTableName",
+        "Item": {
+          "PK": {
+            "S.$": "States.Format('POST#{}', $.postId)"
+          },
+          "SK": {
+            "S": "POST"
+          },
+          "GSI1PK": {
+            "S.$": "States.Format('FEED#{}', $.post.feedId)"
+          },
+          "GSI1SK": {
+            "S.$": "States.Format('{}#{}', 'POST', $.timestamps.created)"
+          },
+          "Caption": {
+            "S.$": "$.post.caption"
+          },
+          "PhotoStorageKey": {
+            "S.$": "$.post.photoStorageKey"
+          },
+          "PhotoUrl": {
+            "S.$": "$.post.photoUrl"
+          },
+          "OwnerId": {
+            "S.$": "$.viewerId"
+          },
+          "ModerationStatus": {
+            "S": "PENDING"
+          },
+          "LikeCount": {
+            "N": "0"
+          },
+          "CommentCount": {
+            "N": "0"
+          },
+          "CreatedAt": {
+            "S.$": "$.timestamps.created"
+          },
+          "UpdatedAt": {
+            "S.$": "$.timestamps.created"
+          }
+        }
+      },
+      "Next": "ModerateCaption"
+    },
+    "ModerateCaption": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:comprehend:detectSentiment",
+      "Parameters": {
+        "LanguageCode": "en",
+        "Text.$": "$.post.caption"
+      },
+      "ResultSelector": {
+        "score.$": "$.SentimentScore.Negative"
+      },
+      "ResultPath": "$.moderation",
+      "Next": "ModerationDecision"
+    },
+    "ModerationDecision": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.moderation.score",
+          "NumericLessThan": 0.3,
+          "Next": "ApprovePost"
+        }
+      ],
+      "Default": "RejectPost"
+    },
+    "ApprovePost": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Parameters": {
+        "TableName.$": "$$.Execution.Input.config.dynamoTableName",
+        "Key": {
+          "PK": {
+            "S.$": "States.Format('POST#{}', $.postId)"
+          },
+          "SK": {
+            "S": "POST"
+          }
+        },
+        "UpdateExpression": "SET ModerationStatus = :status, UpdatedAt = :updated",
+        "ExpressionAttributeValues": {
+          ":status": {
+            "S": "APPROVED"
+          },
+          ":updated": {
+            "S.$": "$.timestamps.updated"
+          }
+        }
+      },
+      "Next": "PublishApprovedEvent"
+    },
+    "PublishApprovedEvent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn.$": "$$.Execution.Input.config.publishTopicArn",
+        "Message.$": "States.JsonToString({\"type\":\"POST_APPROVED\",\"postId\":$.postId,\"viewerId\":$.viewerId,\"feedId\":$.post.feedId})"
+      },
+      "Next": "NotifyAppSyncApproved"
+    },
+    "NotifyAppSyncApproved": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:appsync:graphql",
+      "Parameters": {
+        "ApiId.$": "$$.Execution.Input.config.appSyncApiId",
+        "Query": "mutation PublishFeedEvent($postId: ID!, $type: FeedEventType!, $payload: AWSJSON!) { publishFeedEvent(postId: $postId, type: $type, payload: $payload) { postId type createdAt } }",
+        "OperationName": "PublishFeedEvent",
+        "Variables": {
+          "postId.$": "$.postId",
+          "type": "POST_UPDATED",
+          "payload.$": "States.JsonToString({\"status\":\"APPROVED\",\"moderationScore\":1,\"photoUrl\":$.post.photoUrl})"
+        }
+      },
+      "End": true
+    },
+    "RejectPost": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Parameters": {
+        "TableName.$": "$$.Execution.Input.config.dynamoTableName",
+        "Key": {
+          "PK": {
+            "S.$": "States.Format('POST#{}', $.postId)"
+          },
+          "SK": {
+            "S": "POST"
+          }
+        },
+        "UpdateExpression": "SET ModerationStatus = :status, ModerationReason = :reason, UpdatedAt = :updated",
+        "ExpressionAttributeValues": {
+          ":status": {
+            "S": "REJECTED"
+          },
+          ":reason": {
+            "S": "Caption flagged by Comprehend"
+          },
+          ":updated": {
+            "S.$": "$.timestamps.updated"
+          }
+        }
+      },
+      "Next": "NotifyAppSyncRejected"
+    },
+    "NotifyAppSyncRejected": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:appsync:graphql",
+      "Parameters": {
+        "ApiId.$": "$$.Execution.Input.config.appSyncApiId",
+        "Query": "mutation PublishFeedEvent($postId: ID!, $type: FeedEventType!, $payload: AWSJSON!) { publishFeedEvent(postId: $postId, type: $type, payload: $payload) { postId type createdAt } }",
+        "OperationName": "PublishFeedEvent",
+        "Variables": {
+          "postId.$": "$.postId",
+          "type": "MODERATION_UPDATED",
+          "payload.$": "States.JsonToString({\"status\":\"REJECTED\",\"reason\":\"Caption flagged by Comprehend\"})"
+        }
+      },
+      "End": true
+    }
+  }
+}

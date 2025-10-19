@@ -1,0 +1,61 @@
+---
+import { pendingModeration } from "../stores/feed";
+
+const items = [
+  {
+    id: "mod-1",
+    caption: "Late night deploy energy ⚡️",
+    owner: "Priya Patel",
+    status: "PENDING",
+    submitted: "2m ago"
+  },
+  {
+    id: "mod-2",
+    caption: "Sunset sessions with the team",
+    owner: "Ava Martinez",
+    status: "APPROVED",
+    submitted: "8m ago"
+  },
+  {
+    id: "mod-3",
+    caption: "Re-queuing moderation tests",
+    owner: "Noah Chen",
+    status: "REJECTED",
+    submitted: "14m ago"
+  }
+];
+
+const statusStyles: Record<string, string> = {
+  PENDING: "bg-amber-500/20 text-amber-200",
+  APPROVED: "bg-emerald-500/20 text-emerald-200",
+  REJECTED: "bg-rose-500/20 text-rose-200"
+};
+---
+
+<section id="moderation" class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+  <header class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-white">Moderation</h2>
+      <p class="text-sm text-slate-400">Automated reviews powered by Step Functions & Comprehend.</p>
+    </div>
+    <span class="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-200">
+      {pendingModeration.get()} awaiting
+    </span>
+  </header>
+  <ul class="mt-6 space-y-4 text-sm text-slate-200">
+    {items.map((item) => (
+      <li key={item.id} class="flex items-center justify-between rounded-2xl border border-white/5 bg-slate-900/70 px-4 py-3">
+        <div>
+          <p class="font-semibold text-white">{item.owner}</p>
+          <p class="text-xs text-slate-400">{item.caption}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-slate-500">{item.submitted}</p>
+          <span class={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[item.status]}`}>
+            {item.status}
+          </span>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>

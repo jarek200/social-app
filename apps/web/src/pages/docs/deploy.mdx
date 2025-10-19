@@ -1,0 +1,72 @@
+---
+title: Deployment Guide
+layout: ../../layouts/BaseLayout.astro
+---
+
+# Deployment Guide
+
+Deploy the prototype with a mix of Amplify CLI for managed services and AWS SAM for custom workflows.
+
+## Prerequisites
+
+- Node.js 18+
+- AWS CLI + credentials
+- Amplify CLI (`npm install -g @aws-amplify/cli`)
+- SAM CLI (`brew install aws-sam-cli`)
+
+## 1. Initialize Amplify
+
+```bash
+amplify init
+amplify add auth
+amplify add storage
+amplify add api
+# paste amplify/api/schema.graphql when prompted
+amplify push
+```
+
+## 2. Deploy Step Functions Workflow
+
+```bash
+sam build --template-file infra/sam/template.yaml
+sam deploy --stack-name social-app-backend --capabilities CAPABILITY_IAM \
+  --parameter-overrides AppSyncApiId=$(amplify status api --json | jq -r '.resources[0].serviceMetadata.apiId')
+```
+
+Record the outputs:
+
+- `DynamoTableName`
+- `SavePostStateMachineArn`
+- `FeedEventsTopicArn`
+
+Update the Amplify function environment:
+
+```bash
+amplify update function
+# choose save-post-workflow, add env vars pointing to SAM outputs
+amplify push
+```
+
+## 3. Configure Frontend
+
+Create `apps/web/.env`:
+
+```ini
+PUBLIC_APPSYNC_URL=https://xxx.appsync-api.us-east-1.amazonaws.com/graphql
+PUBLIC_AWS_REGION=us-east-1
+```
+
+Install dependencies and run:
+
+```bash
+npm install
+npm run dev
+```
+
+## 4. Continuous Delivery
+
+1. Connect the repository to Amplify Hosting.
+2. Configure build command `npm run build` and output directory `apps/web/dist`.
+3. Enable preview URLs for pull requests.
+
+That's it—new commits trigger Nx-aware builds and Amplify deployments.

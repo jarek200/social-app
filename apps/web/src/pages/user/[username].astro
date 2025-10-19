@@ -1,0 +1,74 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { listUsers, findUserByUsername } from "../../stores/users";
+import { getPostsByAuthor } from "../../stores/feed";
+
+export async function getStaticPaths() {
+  return listUsers().map((user) => ({
+    params: { username: user.username },
+    props: { username: user.username }
+  }));
+}
+
+const { username } = Astro.props;
+const profile = findUserByUsername(username);
+
+if (!profile) {
+  throw new Error("User not found");
+}
+
+const posts = getPostsByAuthor(profile.id);
+---
+
+<BaseLayout title={`@${profile.username} profile`}>
+  <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="flex items-center gap-4">
+        <img src={profile.avatarUrl} alt={profile.displayName} class="h-16 w-16 rounded-full object-cover" />
+        <div>
+          <h1 class="text-2xl font-semibold text-white">{profile.displayName}</h1>
+          <p class="text-sm text-slate-400">@{profile.username}</p>
+          <p class="mt-2 text-sm text-slate-300">{profile.bio}</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200">
+          Message
+        </button>
+        <button class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400">
+          Follow
+        </button>
+      </div>
+    </header>
+
+    <dl class="grid gap-4 sm:grid-cols-3">
+      <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+        <dt class="text-xs uppercase tracking-wide text-slate-400">Followers</dt>
+        <dd class="text-2xl font-bold text-white">{profile.followers}</dd>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+        <dt class="text-xs uppercase tracking-wide text-slate-400">Following</dt>
+        <dd class="text-2xl font-bold text-white">{profile.following}</dd>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+        <dt class="text-xs uppercase tracking-wide text-slate-400">Posts</dt>
+        <dd class="text-2xl font-bold text-white">{profile.posts}</dd>
+      </div>
+    </dl>
+
+    <section class="space-y-4">
+      <h2 class="text-lg font-semibold text-white">Recent posts</h2>
+      <ul class="grid gap-4">
+        {posts.map((post) => (
+          <li key={post.id} class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+            <a href={`/post/${post.id}`} class="text-white">
+              <h3 class="text-sm font-semibold">{post.caption}</h3>
+              <p class="text-xs text-slate-400">Likes: {post.likes} · Comments: {post.comments.length}</p>
+            </a>
+          </li>
+        ))}
+        {posts.length === 0 && <li class="text-sm text-slate-400">No posts yet.</li>}
+      </ul>
+    </section>
+  </section>
+</BaseLayout>
