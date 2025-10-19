@@ -98,30 +98,6 @@
           }
         }
       },
-      "Next": "PublishApprovedEvent"
-    },
-    "PublishApprovedEvent": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "TopicArn.$": "$$.Execution.Input.config.publishTopicArn",
-        "Message.$": "States.JsonToString({\"type\":\"POST_APPROVED\",\"postId\":$.postId,\"viewerId\":$.viewerId,\"feedId\":$.post.feedId})"
-      },
-      "Next": "NotifyAppSyncApproved"
-    },
-    "NotifyAppSyncApproved": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:appsync:graphql",
-      "Parameters": {
-        "ApiId.$": "$$.Execution.Input.config.appSyncApiId",
-        "Query": "mutation PublishFeedEvent($postId: ID!, $type: FeedEventType!, $payload: AWSJSON!) { publishFeedEvent(postId: $postId, type: $type, payload: $payload) { postId type createdAt } }",
-        "OperationName": "PublishFeedEvent",
-        "Variables": {
-          "postId.$": "$.postId",
-          "type": "POST_UPDATED",
-          "payload.$": "States.JsonToString({\"status\":\"APPROVED\",\"moderationScore\":1,\"photoUrl\":$.post.photoUrl})"
-        }
-      },
       "End": true
     },
     "RejectPost": {
@@ -148,21 +124,6 @@
           ":updated": {
             "S.$": "$.timestamps.updated"
           }
-        }
-      },
-      "Next": "NotifyAppSyncRejected"
-    },
-    "NotifyAppSyncRejected": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:appsync:graphql",
-      "Parameters": {
-        "ApiId.$": "$$.Execution.Input.config.appSyncApiId",
-        "Query": "mutation PublishFeedEvent($postId: ID!, $type: FeedEventType!, $payload: AWSJSON!) { publishFeedEvent(postId: $postId, type: $type, payload: $payload) { postId type createdAt } }",
-        "OperationName": "PublishFeedEvent",
-        "Variables": {
-          "postId.$": "$.postId",
-          "type": "MODERATION_UPDATED",
-          "payload.$": "States.JsonToString({\"status\":\"REJECTED\",\"reason\":\"Caption flagged by Comprehend\"})"
         }
       },
       "End": true

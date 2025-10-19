@@ -1,0 +1,60 @@
+{
+    "api": {
+        "socialapp": {
+            "output": {
+                "authConfig": {
+                    "additionalAuthenticationProviders": [],
+                    "defaultAuthentication": {
+                        "apiKeyConfig": {
+                            "apiKeyExpirationDays": 7,
+                            "description": "api key description"
+                        },
+                        "authenticationType": "API_KEY"
+                    }
+                }
+            },
+            "providerPlugin": "awscloudformation",
+            "service": "AppSync"
+        }
+    },
+    "auth": {
+        "socialappauth": {
+            "customAuth": false,
+            "dependsOn": [],
+            "frontendAuthConfig": {
+                "loginMechanism": [
+                    "EMAIL"
+                ],
+                "mfaConfiguration": "OFF",
+                "mfaTypes": [
+                    "SMS"
+                ],
+                "passwordProtectionSettings": {
+                    "passwordPolicyCharacters": [],
+                    "passwordPolicyMinLength": 8
+                },
+                "signupAttributes": [
+                    "EMAIL"
+                ],
+                "verificationMechanisms": [
+                    "EMAIL"
+                ]
+            },
+            "providerPlugin": "awscloudformation",
+            "service": "Cognito"
+        }
+    },
+    "function": {
+        "SavePostWorkflowTrigger": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda"
+        }
+    },
+    "storage": {
+        "socialappstorage": {
+            "providerPlugin": "awscloudformation",
+            "service": "S3"
+        }
+    }
+}

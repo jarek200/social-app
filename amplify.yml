@@ -9,10 +9,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install
+        - npm install -g pnpm
+        - pnpm install
     build:
       commands:
-        - npm run build
+        - pnpm build
   artifacts:
     baseDirectory: apps/web/dist
     files:

@@ -1,0 +1,18 @@
+{
+    "name": "save-post-workflow-trigger",
+    "version": "1.0.0",
+    "description": "Lambda function to trigger save post workflow",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc index.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "@aws-sdk/client-sfn": "^3.554.0",
+        "@aws-sdk/client-sns": "^3.554.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.30",
+        "typescript": "^5.4.5"
+    }
+}
