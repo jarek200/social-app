@@ -1,4 +1,9 @@
 ---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ModerationPanel from "@components/ModerationPanel.astro";
+import DashboardSidebar from "@components/DashboardSidebar.astro";
+import { RealtimeControls } from "@components/RealtimeControls";
+import { FeedIsland } from "@components/FeedIsland";
 import { getRealtimeMetrics } from "@services/analyticsService";
 import { getFeedSnapshot } from "@stores/feed";
 import { getAdmins, isAdmin, listUsers } from "@stores/users";
@@ -35,7 +40,7 @@ const _metrics = [
       </div>
     </header>
     <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {metrics.map((metric) => (
+      {_metrics.map((metric) => (
         <li class="rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3">
           <p class="text-xs uppercase tracking-wide text-slate-400">{metric.label}</p>
           <p class="text-2xl font-bold text-white">{metric.value}</p>
@@ -50,16 +55,16 @@ const _metrics = [
       <h2 class="text-lg font-semibold text-white">👥 User Roles Demo</h2>
       <p class="text-sm text-slate-400">
         Currently logged in as:
-        <span class={`font-semibold ${userIsAdmin ? "text-amber-400" : "text-blue-400"}`}>
-          {userIsAdmin ? "Admin User" : "Regular User"}
+        <span class={`font-semibold ${_userIsAdmin ? "text-amber-400" : "text-blue-400"}`}>
+          {_userIsAdmin ? "Admin User" : "Regular User"}
         </span>
       </p>
     </header>
     <div class="grid gap-4 md:grid-cols-2">
       <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-        <h3 class="text-sm font-semibold text-white mb-2">Admin Users ({admins.length})</h3>
+        <h3 class="text-sm font-semibold text-white mb-2">Admin Users ({_admins.length})</h3>
         <ul class="space-y-2">
-          {admins.map((admin) => (
+          {_admins.map((admin) => (
             <li class="flex items-center gap-2 text-sm">
               <span class="w-2 h-2 rounded-full bg-amber-400"></span>
               <span class="text-slate-300">{admin.displayName}</span>
@@ -69,9 +74,9 @@ const _metrics = [
         </ul>
       </div>
       <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-        <h3 class="text-sm font-semibold text-white mb-2">All Users ({allUsers.length})</h3>
+        <h3 class="text-sm font-semibold text-white mb-2">All Users ({_allUsers.length})</h3>
         <ul class="space-y-2">
-          {allUsers.map((user) => (
+          {_allUsers.map((user) => (
             <li class="flex items-center gap-2 text-sm">
               <span class={`w-2 h-2 rounded-full ${user.role === "admin" ? "bg-amber-400" : "bg-blue-400"}`}></span>
               <span class="text-slate-300">{user.displayName}</span>
@@ -81,7 +86,7 @@ const _metrics = [
         </ul>
       </div>
     </div>
-    {userIsAdmin && (
+    {_userIsAdmin && (
       <div class="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
         <p class="text-sm text-amber-200">
           🔧 <strong>Admin Privileges:</strong> You can access the moderation console and manage content.

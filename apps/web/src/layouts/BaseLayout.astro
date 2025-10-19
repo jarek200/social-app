@@ -1,10 +1,12 @@
 ---
 import "../styles/global.css";
+import { AppInitializer } from "../components/AppInitializer";
+import PrimaryNav from "../components/PrimaryNav.astro";
 
 const {
-  title = "Social App Prototype",
-  description = "Real-time social photo sharing built on AWS serverless",
-  showNav = true,
+  title: _title = "Social App Prototype", // Used in template
+  description: _description = "Real-time social photo sharing built on AWS serverless", // Used in template
+  showNav: _showNav = true, // Used in template
 } = Astro.props;
 ---
 
@@ -13,8 +15,8 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{_title}</title>
+    <meta name="description" content={_description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -22,7 +24,7 @@ const {
   <body class="min-h-screen bg-slate-950 text-slate-100">
     <AppInitializer client:load />
     <main class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12">
-      {showNav && <PrimaryNav />}
+      {_showNav && <PrimaryNav />}
       <slot />
     </main>
   </body>

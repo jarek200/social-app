@@ -17,12 +17,16 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "correctness": {
+        "noUnusedImports": "warn"
+      },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off",
         "noForEach": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn"
       },
       "style": {
         "useTemplate": "error"
