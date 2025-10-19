@@ -1,6 +1,6 @@
-import { useState } from "preact/hooks";
-import { signOutUser, authStore } from "@services/auth";
+import { authStore, signOutUser } from "@services/auth";
 import { cleanupData } from "@services/dataService";
+import { useState } from "preact/hooks";
 
 export function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,9 +29,9 @@ export function LogoutButton() {
     }
   };
 
-  // In demo mode, always show logout button
-  // TODO: Remove this when real auth is implemented
-  const isDemoMode = true;
+  // Check for demo mode from environment
+  const isDemoMode =
+    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_COGNITO_USER_POOL_ID;
 
   if (!authState.isAuthenticated && !isDemoMode) {
     return null;

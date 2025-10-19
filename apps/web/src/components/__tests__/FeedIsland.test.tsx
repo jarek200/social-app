@@ -1,6 +1,6 @@
+import { feedStore } from "@stores/feed";
 import { fireEvent, render, screen } from "@testing-library/preact";
 import { FeedIsland } from "../FeedIsland";
-import { feedStore } from "@stores/feed";
 
 describe("FeedIsland", () => {
   beforeEach(() => {

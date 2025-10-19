@@ -1,6 +1,6 @@
-import { useState, useEffect } from "preact/hooks";
-import { signInUser, signUpUser, signOutUser, authStore } from "@services/auth";
-import { Button, Input, Alert } from "@components/ui";
+import { Alert, Button, Input } from "@components/ui";
+import { authStore, signInUser, signOutUser, signUpUser } from "@services/auth";
+import { useEffect, useState } from "preact/hooks";
 
 type AuthMode = "signin" | "signup";
 
@@ -62,9 +62,10 @@ export function AuthForm() {
     <div>
       <form onSubmit={handleSubmit} class="grid gap-4">
         {mode === "signup" && (
-          <label class="grid gap-2 text-sm">
-            <span>Email</span>
+          <div class="grid gap-2 text-sm">
+            <label htmlFor="email">Email</label>
             <Input
+              id="email"
               type="email"
               placeholder="you@example.com"
               value={email}
@@ -72,12 +73,13 @@ export function AuthForm() {
               required
               disabled={isLoading}
             />
-          </label>
+          </div>
         )}
 
-        <label class="grid gap-2 text-sm">
-          <span>Username</span>
+        <div class="grid gap-2 text-sm">
+          <label htmlFor="username">Username</label>
           <Input
+            id="username"
             type="text"
             placeholder="your-username"
             value={username}
@@ -85,11 +87,12 @@ export function AuthForm() {
             required
             disabled={isLoading}
           />
-        </label>
+        </div>
 
-        <label class="grid gap-2 text-sm">
-          <span>Password</span>
+        <div class="grid gap-2 text-sm">
+          <label htmlFor="password">Password</label>
           <Input
+            id="password"
             type="password"
             placeholder="••••••••"
             value={password}
@@ -97,7 +100,7 @@ export function AuthForm() {
             required
             disabled={isLoading}
           />
-        </label>
+        </div>
 
         {error && <Alert variant="danger">{error}</Alert>}
 

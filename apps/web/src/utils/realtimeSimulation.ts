@@ -1,6 +1,6 @@
-import { feedStore, addComment, toggleLike } from "@stores/feed";
 import { chatMessagesStore } from "@stores/chat";
-import { notifyNewPost, notifyNewLike, notifyNewComment } from "./notifications";
+import { addComment, feedStore, toggleLike } from "@stores/feed";
+import { notifyNewComment, notifyNewLike, notifyNewPost } from "./notifications";
 
 // Simulation data
 const sampleCaptions = [

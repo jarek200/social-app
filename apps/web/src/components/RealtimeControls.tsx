@@ -1,15 +1,15 @@
-import { useState, useEffect } from "preact/hooks";
-import type { JSX } from "preact";
 import { useStore } from "@nanostores/preact";
-import { 
-  realtimeOperations, 
-  isConnectedStore, 
+import {
   connectionErrorStore,
-  realtimeEventsStore 
+  isConnectedStore,
+  realtimeEventsStore,
+  realtimeOperations,
 } from "@services/realtimeService";
+import type { JSX } from "preact";
+import { useState } from "preact/hooks";
 
 export function RealtimeControls(): JSX.Element {
-  const [isRunning, setIsRunning] = useState(false);
+  const [_isRunning, _setIsRunning] = useState(false);
   const [_stats, _setStats] = useState({
     posts: 0,
     likes: 0,
@@ -37,9 +37,7 @@ export function RealtimeControls(): JSX.Element {
           <p class="text-xs text-slate-400">
             {isConnected ? "Connected - Live updates active" : "Disconnected - Static demo data"}
           </p>
-          {connectionError && (
-            <p class="text-xs text-red-400 mt-1">Error: {connectionError}</p>
-          )}
+          {connectionError && <p class="text-xs text-red-400 mt-1">Error: {connectionError}</p>}
         </div>
         <button
           type="button"
@@ -56,12 +54,10 @@ export function RealtimeControls(): JSX.Element {
 
       {isConnected && (
         <div class="space-y-2">
-          <div class="text-xs text-slate-400">
-            Recent events ({realtimeEvents.length})
-          </div>
+          <div class="text-xs text-slate-400">Recent events ({realtimeEvents.length})</div>
           <div class="max-h-32 overflow-y-auto space-y-1">
-            {realtimeEvents.slice(0, 5).map((event, index) => (
-              <div key={index} class="text-xs text-slate-300 bg-slate-800/30 rounded px-2 py-1">
+            {realtimeEvents.slice(0, 5).map((event) => (
+              <div key={`${event.postId}-${event.createdAt}`} class="text-xs text-slate-300 bg-slate-800/30 rounded px-2 py-1">
                 <span class="text-emerald-400">{event.type}</span> on post {event.postId.slice(-8)}
               </div>
             ))}
@@ -70,10 +66,9 @@ export function RealtimeControls(): JSX.Element {
       )}
 
       <div class="mt-3 text-xs text-slate-500">
-        {isConnected 
+        {isConnected
           ? "Connected to AppSync GraphQL subscriptions for real-time updates."
-          : "Demo mode: Simulated real-time events for development."
-        }
+          : "Demo mode: Simulated real-time events for development."}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import { useState } from "preact/hooks";
-import { isFollowing, followUser, unfollowUser } from "@stores/users";
 import { Button } from "@components/ui";
+import { followUser, isFollowing, unfollowUser } from "@stores/users";
+import { useState } from "preact/hooks";
 
 interface FollowButtonProps {
   targetUserId: string;

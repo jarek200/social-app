@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/preact";
-import { useMemo, useState } from "preact/hooks";
 import { chatChannelsStore, chatMessagesStore } from "@stores/chat";
+import { useMemo, useState } from "preact/hooks";
 
 export function ChatConsole() {
   const channels = useStore(chatChannelsStore);

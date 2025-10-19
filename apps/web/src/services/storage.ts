@@ -1,4 +1,4 @@
-import { uploadData, getUrl, remove } from 'aws-amplify/storage';
+import { getUrl, remove, uploadData } from "aws-amplify/storage";
 
 export type UploadProgress = {
   loaded: number;
@@ -21,13 +21,13 @@ export const uploadFile = async (
     const key = `posts/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
     // Check if we're in demo mode
-    const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || 
-                       !import.meta.env.PUBLIC_S3_BUCKET;
+    const isDemoMode =
+      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
 
     if (isDemoMode) {
       // Demo mode: Create a local object URL
       const url = URL.createObjectURL(file);
-      
+
       // Simulate upload progress
       if (onProgress) {
         const totalBytes = file.size;
@@ -53,11 +53,17 @@ export const uploadFile = async (
     }
 
     // Production mode: Upload to S3
-    const result = await uploadData({
+    const uploadResult = await uploadData({
       key,
       data: file,
       options: {
-        onProgress: ({ transferredBytes, totalBytes }: { transferredBytes: number; totalBytes: number }) => {
+        onProgress: ({
+          transferredBytes,
+          totalBytes,
+        }: {
+          transferredBytes: number;
+          totalBytes: number;
+        }) => {
           if (onProgress && totalBytes) {
             onProgress({
               loaded: transferredBytes,
@@ -67,15 +73,17 @@ export const uploadFile = async (
           }
         },
       },
-    }).result;
+    });
+    const result = uploadResult.result;
 
     // Get the public URL for the uploaded file
-    const url = await getUrl({
+    const urlResult = await getUrl({
       key: result.key,
       options: {
         expiresIn: 3600, // 1 hour
       },
-    }).result;
+    });
+    const url = urlResult.result;
 
     return {
       key: result.key,
@@ -90,12 +98,12 @@ export const uploadFile = async (
 export const deleteFile = async (key: string): Promise<void> => {
   try {
     // Check if we're in demo mode
-    const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || 
-                       !import.meta.env.PUBLIC_S3_BUCKET;
+    const isDemoMode =
+      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
 
     if (isDemoMode) {
       // Demo mode: Revoke object URL if it's a demo key
-      if (key.startsWith('demo-')) {
+      if (key.startsWith("demo-")) {
         // In demo mode, we can't actually delete the object URL
         // but we can log it for debugging
         console.log(`Demo mode: Would delete file ${key}`);
@@ -114,12 +122,12 @@ export const deleteFile = async (key: string): Promise<void> => {
 export const getFileUrl = async (key: string, expiresIn: number = 3600): Promise<string> => {
   try {
     // Check if we're in demo mode
-    const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || 
-                       !import.meta.env.PUBLIC_S3_BUCKET;
+    const isDemoMode =
+      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
 
     if (isDemoMode) {
       // Demo mode: Return the key as-is if it's already a URL
-      if (key.startsWith('blob:') || key.startsWith('http')) {
+      if (key.startsWith("blob:") || key.startsWith("http")) {
         return key;
       }
       // Otherwise, return a placeholder
@@ -127,12 +135,13 @@ export const getFileUrl = async (key: string, expiresIn: number = 3600): Promise
     }
 
     // Production mode: Get signed URL from S3
-    const result = await getUrl({
+    const urlResult = await getUrl({
       key,
       options: {
         expiresIn,
       },
-    }).result;
+    });
+    const result = urlResult.result;
 
     return result.url.toString();
   } catch (error) {

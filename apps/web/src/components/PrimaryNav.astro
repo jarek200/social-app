@@ -1,7 +1,5 @@
 ---
 import { isAdmin } from "@stores/users";
-import { SearchBar } from "@components/SearchBar";
-import { LogoutButton } from "@components/LogoutButton";
 
 // Mock current user - in real app, get from auth context
 const currentUserId = "user-2"; // Noah is admin
@@ -19,9 +17,9 @@ const baseNavItems = [
 
 const adminNavItems = [{ label: "Admin", href: "/admin/moderation" }];
 
-const navItems = userIsAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
+const _navItems = userIsAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
 
-const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const _pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 ---
 
 <div class="rounded-3xl border border-white/10 bg-slate-900/70 px-6 py-4 backdrop-blur">

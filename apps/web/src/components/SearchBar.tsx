@@ -1,8 +1,7 @@
-
-import type { JSX } from "preact";
-import { useState, useMemo } from "preact/hooks";
-import { searchUsers } from "@stores/users";
 import { searchPosts } from "@stores/feed";
+import { searchUsers } from "@stores/users";
+import type { JSX } from "preact";
+import { useMemo, useState } from "preact/hooks";
 
 type SearchResult = {
   type: "user" | "post";
@@ -69,7 +68,8 @@ export function SearchBar(): JSX.Element {
           class="w-full rounded-full border border-white/10 bg-slate-950/60 px-4 py-2 pl-10 text-white placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         />
         <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-          <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Search icon">
+            <title>Search</title>
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -85,6 +85,7 @@ export function SearchBar(): JSX.Element {
           <div class="p-2">
             {searchResults.map((result) => (
               <button
+                type="button"
                 key={`${result.type}-${result.id}`}
                 onClick={() => handleResultClick(result)}
                 class="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-white/10"
@@ -111,7 +112,9 @@ export function SearchBar(): JSX.Element {
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        aria-label="User icon"
                       >
+                        <title>User</title>
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -125,7 +128,9 @@ export function SearchBar(): JSX.Element {
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        aria-label="Post icon"
                       >
+                        <title>Post</title>
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"

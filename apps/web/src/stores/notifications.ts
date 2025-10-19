@@ -14,17 +14,17 @@ const seed: Notification[] = [
     id: "notif-1",
     type: "LIKE",
     actor: "Priya Patel",
-    message: "liked your post \"Sunset vibes\"",
+    message: 'liked your post "Sunset vibes"',
     createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    read: false
+    read: false,
   },
   {
     id: "notif-2",
     type: "COMMENT",
     actor: "Noah Chen",
-    message: "commented \"Releasing tonight?\"",
+    message: 'commented "Releasing tonight?"',
     createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    read: false
+    read: false,
   },
   {
     id: "notif-3",
@@ -32,8 +32,8 @@ const seed: Notification[] = [
     actor: "Maya Stone",
     message: "started following you",
     createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    read: true
-  }
+    read: true,
+  },
 ];
 
 export const notificationsStore = atom<Notification[]>(seed);
@@ -44,13 +44,14 @@ export const markNotificationRead = (id: string) => {
       notif.id === id
         ? {
             ...notif,
-            read: true
+            read: true,
           }
-        : notif
-    )
+        : notif,
+    ),
   );
 };
 
-export const unreadCount = (): number => notificationsStore.get().filter((notif) => !notif.read).length;
+export const unreadCount = (): number =>
+  notificationsStore.get().filter((notif) => !notif.read).length;
 
 export const getNotificationSnapshot = () => notificationsStore.get();

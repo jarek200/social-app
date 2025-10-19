@@ -1,5 +1,5 @@
-import { useState, useRef } from "preact/hooks";
-import { uploadFile, type UploadProgress } from "@services/storage";
+import { type UploadProgress, uploadFile } from "@services/storage";
+import { useRef, useState } from "preact/hooks";
 
 type FileUploadProps = {
   onUploadComplete: (result: { key: string; url: string }) => void;
@@ -83,23 +83,18 @@ export function FileUpload({
 
   return (
     <div class="w-full">
-      <div
-        class={`relative flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-6 transition-colors ${
+      <button
+        type="button"
+        class={`relative flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-6 transition-colors w-full ${
           dragActive ? "border-brand-400 bg-brand-500/10" : "border-white/40 bg-slate-950/40"
         } ${isUploading ? "pointer-events-none opacity-50" : "cursor-pointer hover:border-brand-400"}`}
-        role="button"
-        tabIndex={0}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={openFileDialog}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openFileDialog();
-          }
-        }}
+        aria-label="File upload area. Click or drag and drop to upload."
+        disabled={isUploading}
       >
         <input
           ref={fileInputRef}
@@ -140,7 +135,7 @@ export function FileUpload({
             </div>
           </>
         )}
-      </div>
+      </button>
     </div>
   );
 }

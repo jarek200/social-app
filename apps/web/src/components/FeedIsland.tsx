@@ -1,8 +1,8 @@
+import { Badge, Button } from "@components/ui";
 import { useStore } from "@nanostores/preact";
+import { addComment, filteredFeedStore, toggleLike } from "@stores/feed";
 import type { JSX } from "preact";
 import { useState } from "preact/hooks";
-import { addComment, filteredFeedStore, toggleLike } from "@stores/feed";
-import { Button, Badge } from "@components/ui";
 
 const formatTimeAgo = (isoDate: string) => {
   const elapsedMs = Date.now() - new Date(isoDate).getTime();

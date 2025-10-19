@@ -1,10 +1,10 @@
-import type { JSX } from "preact";
 import {
   calculateAnalyticsMetrics,
+  getRecentActivity,
   getTopPosts,
   getUserGrowthData,
-  getRecentActivity,
 } from "@services/analyticsService";
+import type { JSX } from "preact";
 
 export function AnalyticsDashboard(): JSX.Element {
   // Calculate analytics from real data
@@ -113,9 +113,9 @@ export function AnalyticsDashboard(): JSX.Element {
       <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
         <h3 class="text-lg font-semibold text-white mb-4">Recent Activity</h3>
         <div class="space-y-3">
-          {recentActivity.map((activity, index) => (
+          {recentActivity.map((activity) => (
             <div
-              key={`activity-${index}`}
+              key={`activity-${activity.user}-${activity.time}`}
               class="flex items-center gap-4 p-3 rounded-xl bg-slate-800/30"
             >
               <div class="w-2 h-2 rounded-full bg-brand-500" />

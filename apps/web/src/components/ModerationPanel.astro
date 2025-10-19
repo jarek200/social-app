@@ -1,29 +1,30 @@
 ---
-const items = [
+const _items = [
   {
     id: "mod-1",
     caption: "Late night deploy energy ⚡️",
     owner: "Priya Patel",
-    status: "PENDING",
+    status: "PENDING" as const,
     submitted: "2m ago",
   },
   {
     id: "mod-2",
     caption: "Sunset sessions with the team",
     owner: "Ava Martinez",
-    status: "APPROVED",
+    status: "APPROVED" as const,
     submitted: "8m ago",
   },
   {
     id: "mod-3",
     caption: "Re-queuing moderation tests",
     owner: "Noah Chen",
-    status: "REJECTED",
+    status: "REJECTED" as const,
     submitted: "14m ago",
   },
 ];
 
-const statusStyles = {
+type Status = "PENDING" | "APPROVED" | "REJECTED";
+const _statusStyles: Record<Status, string> = {
   PENDING: "bg-amber-500/20 text-amber-200",
   APPROVED: "bg-emerald-500/20 text-emerald-200",
   REJECTED: "bg-rose-500/20 text-rose-200",

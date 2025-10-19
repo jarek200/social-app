@@ -1,6 +1,7 @@
 import { useEffect } from "preact/hooks";
+import "@config/amplify";
 import { initializeAuth } from "@services/auth";
-import { initializeData, cleanupData } from "@services/dataService";
+import { cleanupData, initializeData } from "@services/dataService";
 
 export function AppInitializer() {
   useEffect(() => {

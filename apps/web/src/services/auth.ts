@@ -1,5 +1,4 @@
-// Note: These imports will work after installing aws-amplify
-// import { signIn, signUp, signOut, getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession, getCurrentUser, signIn, signOut, signUp } from "aws-amplify/auth";
 import { atom } from "nanostores";
 
 export type User = {
@@ -31,38 +30,29 @@ export const initializeAuth = async () => {
   try {
     authStore.set({ ...authStore.get(), isLoading: true });
 
-    // const user = await getCurrentUser();
-    // const session = await fetchAuthSession();
+    const user = await getCurrentUser().catch(() => null);
+    const session = await fetchAuthSession().catch(() => null);
 
-    // if (user && session.tokens) {
-    //   authStore.set({
-    //     user: {
-    //       id: user.userId,
-    //       username: user.username,
-    //       email: user.signInDetails?.loginId,
-    //     },
-    //     isAuthenticated: true,
-    //     isLoading: false,
-    //     error: null,
-    //   });
-    // } else {
-    //   authStore.set({
-    //     user: null,
-    //     isAuthenticated: false,
-    //     isLoading: false,
-    //     error: null,
-    //   });
-    // }
-
-    // Temporary mock state until aws-amplify is installed
-    authStore.set({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-    });
-  } catch (error) {
-    console.log("No authenticated user:", error);
+    if (user && session?.tokens) {
+      authStore.set({
+        user: {
+          id: user.userId,
+          username: user.username,
+          email: user.signInDetails?.loginId,
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } else {
+      authStore.set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      });
+    }
+  } catch (_error) {
     authStore.set({
       user: null,
       isAuthenticated: false,
@@ -72,27 +62,21 @@ export const initializeAuth = async () => {
   }
 };
 
-export const signInUser = async (_username: string, _password: string) => {
+export const signInUser = async (username: string, password: string) => {
   try {
     authStore.set({ ...authStore.get(), isLoading: true, error: null });
 
-    // const { isSignedIn, nextStep } = await signIn({
-    //   username,
-    //   password,
-    // });
+    const { isSignedIn, nextStep } = await signIn({ username, password });
 
-    // if (isSignedIn) {
-    //   await initializeAuth();
-    // } else {
-    //   authStore.set({
-    //     ...authStore.get(),
-    //     isLoading: false,
-    //     error: `Sign in requires: ${nextStep.signInStep}`,
-    //   });
-    // }
-
-    // Temporary mock response until aws-amplify is installed
-    throw new Error("Authentication service not configured - install aws-amplify first");
+    if (isSignedIn) {
+      await initializeAuth();
+    } else {
+      authStore.set({
+        ...authStore.get(),
+        isLoading: false,
+        error: `Sign in requires: ${nextStep.signInStep}`,
+      });
+    }
   } catch (error) {
     authStore.set({
       ...authStore.get(),
@@ -102,32 +86,27 @@ export const signInUser = async (_username: string, _password: string) => {
   }
 };
 
-export const signUpUser = async (_username: string, _password: string, _email: string) => {
+export const signUpUser = async (username: string, password: string, email: string) => {
   try {
     authStore.set({ ...authStore.get(), isLoading: true, error: null });
 
-    // const { isSignUpComplete, nextStep } = await signUp({
-    //   username,
-    //   password,
-    //   options: {
-    //     userAttributes: {
-    //       email,
-    //     },
-    //   },
-    // });
+    const { isSignUpComplete, nextStep } = await signUp({
+      username,
+      password,
+      options: {
+        userAttributes: { email },
+      },
+    });
 
-    // if (isSignUpComplete) {
-    //   await initializeAuth();
-    // } else {
-    //   authStore.set({
-    //     ...authStore.get(),
-    //     isLoading: false,
-    //     error: `Sign up requires: ${nextStep.signUpStep}`,
-    //   });
-    // }
-
-    // Temporary mock response until aws-amplify is installed
-    throw new Error("Authentication service not configured - install aws-amplify first");
+    if (isSignUpComplete) {
+      authStore.set({ ...authStore.get(), isLoading: false, error: null });
+    } else {
+      authStore.set({
+        ...authStore.get(),
+        isLoading: false,
+        error: `Sign up requires: ${nextStep.signUpStep}`,
+      });
+    }
   } catch (error) {
     authStore.set({
       ...authStore.get(),
@@ -139,7 +118,7 @@ export const signUpUser = async (_username: string, _password: string, _email: s
 
 export const signOutUser = async () => {
   try {
-    // await signOut();
+    await signOut();
     authStore.set({
       user: null,
       isAuthenticated: false,

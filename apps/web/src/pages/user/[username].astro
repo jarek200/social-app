@@ -1,8 +1,6 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
 import { getPostsByAuthor } from "@stores/feed";
-import { listUsers, findUserByUsername } from "@stores/users";
-import { FollowButton } from "@components/FollowButton";
+import { findUserByUsername, listUsers } from "@stores/users";
 
 export async function getStaticPaths() {
   return listUsers().map((user) => ({
@@ -12,7 +10,7 @@ export async function getStaticPaths() {
 }
 
 const { username } = Astro.props;
-const currentUserId = "user-2"; // Demo: Noah is logged in
+const _currentUserId = "user-2"; // Demo: Noah is logged in
 
 const profile = findUserByUsername(username);
 
@@ -20,7 +18,7 @@ if (!profile) {
   throw new Error("User not found");
 }
 
-const posts = getPostsByAuthor(profile.id);
+const _posts = getPostsByAuthor(profile.id);
 ---
 
 <BaseLayout title={`@${profile.username} profile`}>

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "preact/hooks";
-import type { JSX } from "preact";
 import { requestNotificationPermission } from "@utils/notifications";
+import type { JSX } from "preact";
+import { useEffect, useState } from "preact/hooks";
 
 export function NotificationPermissions(): JSX.Element {
   const [permission, setPermission] = useState<NotificationPermission>("default");

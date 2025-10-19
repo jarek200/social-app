@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/preact";
+import { type FeedFilter, feedFilterStore, setFeedFilter } from "@stores/feed";
 import type { JSX } from "preact";
-import { feedFilterStore, setFeedFilter, type FeedFilter } from "@stores/feed";
 
 export function FeedFilterComponent(): JSX.Element {
   const currentFilter = useStore(feedFilterStore);

@@ -1,5 +1,6 @@
-import { generateClient } from 'aws-amplify/api';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { generateClient } from "aws-amplify/api";
+import { fetchAuthSession } from "aws-amplify/auth";
+
 type PostRecord = {
   id: string;
   caption: string;
@@ -12,15 +13,47 @@ type PostRecord = {
   feedId: string;
 };
 
+type CommentRecord = {
+  id: string;
+  body: string;
+  createdAt: string;
+  owner: string;
+  postId: string;
+};
+
+type LikeRecord = {
+  id: string;
+  postId: string;
+  owner: string;
+  createdAt: string;
+};
+
+type ProfileRecord = {
+  id: string;
+  handle: string;
+  displayName: string;
+  avatarUrl?: string;
+  bio?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type FeedEventData = {
+  postId: string;
+  type: string;
+  payload: Record<string, unknown>;
+  createdAt: string;
+};
+
 // Create Amplify GraphQL client
 const client = generateClient();
 
 // Helper function to get auth headers
-async function getAuthHeaders() {
+async function _getAuthHeaders() {
   try {
     const session = await fetchAuthSession();
     return {
-      'Authorization': session.tokens?.idToken?.toString() || '',
+      Authorization: session.tokens?.idToken?.toString() || "",
     };
   } catch (error) {
     console.warn("No auth session available:", error);
@@ -37,14 +70,20 @@ async function callGraphQL<TData, TVariables = Record<string, unknown>>(
     const result = await client.graphql({
       query,
       variables,
-      authMode: 'userPool',
+      authMode: "userPool",
     });
 
-    if (result.errors && result.errors.length > 0) {
+    // Check if result has errors (for GraphQLResult)
+    if ("errors" in result && result.errors && result.errors.length > 0) {
       throw new Error(`GraphQL errors: ${JSON.stringify(result.errors, null, 2)}`);
     }
 
-    return result.data as TData;
+    // Return data (for GraphQLResult)
+    if ("data" in result) {
+      return result.data as TData;
+    }
+
+    throw new Error("Invalid GraphQL result format");
   } catch (error) {
     console.error("GraphQL request failed:", error);
     throw error;
@@ -98,11 +137,8 @@ export const mutations = {
     return data.createPost;
   },
 
-  async createComment(input: {
-    postId: string;
-    body: string;
-  }): Promise<any> {
-    const data = await callGraphQL<{ createComment: any }>(
+  async createComment(input: { postId: string; body: string }): Promise<CommentRecord> {
+    const data = await callGraphQL<{ createComment: CommentRecord }>(
       /* GraphQL */ `
         mutation CreateComment($input: CreateCommentInput!) {
           createComment(input: $input) {
@@ -119,10 +155,8 @@ export const mutations = {
     return data.createComment;
   },
 
-  async createLike(input: {
-    postId: string;
-  }): Promise<any> {
-    const data = await callGraphQL<{ createLike: any }>(
+  async createLike(input: { postId: string }): Promise<LikeRecord> {
+    const data = await callGraphQL<{ createLike: LikeRecord }>(
       /* GraphQL */ `
         mutation CreateLike($input: CreateLikeInput!) {
           createLike(input: $input) {
@@ -138,10 +172,8 @@ export const mutations = {
     return data.createLike;
   },
 
-  async deleteLike(input: {
-    postId: string;
-  }): Promise<any> {
-    const data = await callGraphQL<{ deleteLike: any }>(
+  async deleteLike(input: { postId: string }): Promise<LikeRecord> {
+    const data = await callGraphQL<{ deleteLike: LikeRecord }>(
       /* GraphQL */ `
         mutation DeleteLike($input: DeleteLikeInput!) {
           deleteLike(input: $input) {
@@ -203,8 +235,8 @@ export const queries = {
     return data.getPost;
   },
 
-  async listCommentsForPost(postId: string): Promise<any[]> {
-    const data = await callGraphQL<{ listCommentsForPost: { items: any[] } }>(
+  async listCommentsForPost(postId: string): Promise<CommentRecord[]> {
+    const data = await callGraphQL<{ listCommentsForPost: { items: CommentRecord[] } }>(
       /* GraphQL */ `
         query ListCommentsForPost($postId: ID!) {
           listCommentsForPost(postId: $postId) {
@@ -223,8 +255,8 @@ export const queries = {
     return data.listCommentsForPost.items;
   },
 
-  async myProfile(): Promise<any> {
-    const data = await callGraphQL<{ myProfile: any }>(
+  async myProfile(): Promise<ProfileRecord> {
+    const data = await callGraphQL<{ myProfile: ProfileRecord }>(
       /* GraphQL */ `
         query MyProfile {
           myProfile {
@@ -245,8 +277,8 @@ export const queries = {
 
 // Real-time subscriptions
 export const subscriptions = {
-  onFeedEvent(feedId: string, callback: (data: any) => void) {
-    return client.graphql({
+  async onFeedEvent(feedId: string, callback: (data: FeedEventData) => void) {
+    const subscription = await client.graphql({
       query: /* GraphQL */ `
         subscription OnFeedEvent($feedId: ID!) {
           onFeedEvent(feedId: $feedId) {
@@ -258,10 +290,12 @@ export const subscriptions = {
         }
       `,
       variables: { feedId },
-      authMode: 'userPool',
-    }).subscribe({
-      next: (data: any) => callback(data),
-      error: (error: any) => console.error('Subscription error:', error),
+      authMode: "userPool",
+    });
+
+    return subscription.subscribe({
+      next: (data: FeedEventData) => callback(data),
+      error: (error: unknown) => console.error("Subscription error:", error),
     });
   },
 };

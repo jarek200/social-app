@@ -1,8 +1,8 @@
+import { Alert, Button, Textarea } from "@components/ui";
+import { authStore } from "@services/auth";
+import { savePost } from "@services/dataService";
 import { useState } from "preact/hooks";
 import { FileUpload } from "./FileUpload";
-import { savePost } from "@services/dataService";
-import { authStore } from "@services/auth";
-import { Button, Textarea, Alert } from "@components/ui";
 
 type UploadResult = {
   key: string;
@@ -74,18 +74,19 @@ export function CreatePostForm() {
   return (
     <form onSubmit={handleSubmit} class="grid gap-5 lg:grid-cols-2">
       <div class="grid gap-3">
-        <label class="grid gap-2 text-sm">
-          <span>Caption</span>
+        <div class="grid gap-2 text-sm">
+          <label htmlFor="caption">Caption</label>
           <Textarea
+            id="caption"
             rows={5}
             placeholder="Share what's happening..."
             value={caption}
             onInput={(e) => setCaption((e.target as HTMLTextAreaElement).value)}
             disabled={isSubmitting}
           />
-        </label>
+        </div>
 
-        <label class="grid gap-2 text-sm">
+        <div class="grid gap-2 text-sm">
           <span>Attach photo</span>
           <FileUpload
             onUploadComplete={handleUploadComplete}
@@ -93,7 +94,7 @@ export function CreatePostForm() {
             accept="image/*"
             maxSize={10}
           />
-        </label>
+        </div>
 
         {uploadResult && (
           <div class="rounded-xl border border-green-500/30 bg-green-500/10 p-3">

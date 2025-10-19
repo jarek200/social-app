@@ -1,9 +1,7 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
 import { getNotificationSnapshot } from "@stores/notifications";
-import { NotificationPermissions } from "@components/NotificationPermissions";
 
-const notifications = getNotificationSnapshot();
+const _notifications = getNotificationSnapshot();
 ---
 
 <BaseLayout title="Notifications">

@@ -1,21 +1,16 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import DashboardSidebar from "@components/DashboardSidebar.astro";
-import { FeedIsland } from "@components/FeedIsland";
-import ModerationPanel from "@components/ModerationPanel.astro";
-import { RealtimeControls } from "@components/RealtimeControls";
-import { getAdmins, isAdmin, listUsers } from "@stores/users";
-import { getFeedSnapshot } from "@stores/feed";
 import { getRealtimeMetrics } from "@services/analyticsService";
+import { getFeedSnapshot } from "@stores/feed";
+import { getAdmins, isAdmin, listUsers } from "@stores/users";
 
 const currentUserId = "user-2"; // Noah (admin)
-const userIsAdmin = isAdmin(currentUserId);
-const admins = getAdmins();
-const allUsers = listUsers();
+const _userIsAdmin = isAdmin(currentUserId);
+const _admins = getAdmins();
+const _allUsers = listUsers();
 const feed = getFeedSnapshot();
 const realtimeMetrics = getRealtimeMetrics();
 
-const metrics = [
+const _metrics = [
   { label: "New posts", value: feed.length.toString(), delta: "+18%" },
   { label: "Active sessions", value: realtimeMetrics.activeViewers.toLocaleString(), delta: "+6%" },
   { label: "Workflow latency", value: "1.8s", delta: "p95" },

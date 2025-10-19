@@ -14,7 +14,7 @@ export const demoPosts = [
     feedId: "GLOBAL",
   },
   {
-    id: "demo-post-2", 
+    id: "demo-post-2",
     caption: "Sunset coding session ☀️",
     photoUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop",
     moderationStatus: "APPROVED" as const,
@@ -47,7 +47,7 @@ export const demoComments = [
   },
   {
     id: "demo-comment-2",
-    postId: "demo-post-1", 
+    postId: "demo-post-1",
     owner: "user-3",
     body: "Love the design!",
     createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
@@ -73,7 +73,7 @@ export const demoOperations = {
       owner: "current-user",
       feedId: "GLOBAL",
     };
-    
+
     const currentPosts = demoPostsStore.get();
     demoPostsStore.set([newPost, ...currentPosts]);
     return newPost;
@@ -87,41 +87,39 @@ export const demoOperations = {
       body: input.body,
       createdAt: new Date().toISOString(),
     };
-    
+
     const currentComments = demoCommentsStore.get();
     demoCommentsStore.set([...currentComments, newComment]);
-    
+
     // Update comment count
     const currentPosts = demoPostsStore.get();
-    const updatedPosts = currentPosts.map(post => 
-      post.id === input.postId 
-        ? { ...post, commentCount: post.commentCount + 1 }
-        : post
+    const updatedPosts = currentPosts.map((post) =>
+      post.id === input.postId ? { ...post, commentCount: post.commentCount + 1 } : post,
     );
     demoPostsStore.set(updatedPosts);
-    
+
     return newComment;
   },
 
   async toggleLike(postId: string) {
     const currentLikes = demoLikesStore.get();
     const isLiked = currentLikes.includes(postId);
-    
+
     if (isLiked) {
-      demoLikesStore.set(currentLikes.filter(id => id !== postId));
+      demoLikesStore.set(currentLikes.filter((id) => id !== postId));
     } else {
       demoLikesStore.set([...currentLikes, postId]);
     }
-    
+
     // Update like count
     const currentPosts = demoPostsStore.get();
-    const updatedPosts = currentPosts.map(post => 
-      post.id === postId 
+    const updatedPosts = currentPosts.map((post) =>
+      post.id === postId
         ? { ...post, likeCount: isLiked ? post.likeCount - 1 : post.likeCount + 1 }
-        : post
+        : post,
     );
     demoPostsStore.set(updatedPosts);
-    
+
     return { isLiked: !isLiked };
   },
 };

@@ -1,11 +1,11 @@
 import { atom } from "nanostores";
-import { queries, mutations, subscriptions } from "./appsyncClient";
+import { mutations, queries, subscriptions } from "./appsyncClient";
 import { authStore } from "./auth";
-import { demoOperations, demoPostsStore, demoCommentsStore, demoLikesStore } from "./demoService";
+import { demoOperations, demoPostsStore } from "./demoService";
 
 // Check if we're in demo mode
-const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || 
-                   !import.meta.env.PUBLIC_APPSYNC_URL;
+const isDemoMode =
+  import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
 
 export type Post = {
   id: string;
@@ -199,7 +199,7 @@ export const toggleLike = async (postId: string) => {
 };
 
 // Real-time subscriptions
-let feedSubscription: any = null;
+let feedSubscription: { unsubscribe: () => void } | null = null;
 
 export const subscribeToFeed = (feedId: string = "GLOBAL") => {
   // Clean up existing subscription
