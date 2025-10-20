@@ -5,23 +5,11 @@ import DashboardSidebar from "@components/DashboardSidebar.astro";
 import { RealtimeControls } from "@components/RealtimeControls";
 import { FeedIsland } from "@components/FeedIsland";
 import { AuthGuard } from "@components/AuthGuard";
-import { getRealtimeMetrics } from "@services/analyticsService";
-import { getFeedSnapshot } from "@stores/feed";
-import { getAdmins, isAdmin, listUsers } from "@stores/users";
+import { DashboardMetrics } from "@components/DashboardMetrics";
+import { UserRoles } from "@components/UserRoles";
 
-const currentUserId = "user-2"; // Noah (admin)
-const _userIsAdmin = isAdmin(currentUserId);
-const _admins = getAdmins();
-const _allUsers = listUsers();
-const feed = getFeedSnapshot();
-const realtimeMetrics = getRealtimeMetrics();
-
-const _metrics = [
-  { label: "New posts", value: feed.length.toString(), delta: "+18%" },
-  { label: "Active sessions", value: realtimeMetrics.activeViewers.toLocaleString(), delta: "+6%" },
-  { label: "Workflow latency", value: "1.8s", delta: "p95" },
-  { label: "Alerts", value: realtimeMetrics.pendingModeration.toString(), delta: "open" },
-];
+// Check if we're in demo mode
+const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
 ---
 
 <BaseLayout>
@@ -41,62 +29,10 @@ const _metrics = [
         </button>
       </div>
     </header>
-    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {_metrics.map((metric) => (
-        <li class="rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3">
-          <p class="text-xs uppercase tracking-wide text-slate-400">{metric.label}</p>
-          <p class="text-2xl font-bold text-white">{metric.value}</p>
-          <p class="text-xs text-emerald-300">{metric.delta}</p>
-        </li>
-      ))}
-    </ul>
+    <DashboardMetrics client:load />
   </section>
 
-  <section class="rounded-3xl border border-white/10 bg-slate-900/60 p-6">
-    <header class="mb-4">
-      <h2 class="text-lg font-semibold text-white">👥 User Roles Demo</h2>
-      <p class="text-sm text-slate-400">
-        Currently logged in as:
-        <span class={`font-semibold ${_userIsAdmin ? "text-amber-400" : "text-blue-400"}`}>
-          {_userIsAdmin ? "Admin User" : "Regular User"}
-        </span>
-      </p>
-    </header>
-    <div class="grid gap-4 md:grid-cols-2">
-      <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-        <h3 class="text-sm font-semibold text-white mb-2">Admin Users ({_admins.length})</h3>
-        <ul class="space-y-2">
-          {_admins.map((admin) => (
-            <li class="flex items-center gap-2 text-sm">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <span class="text-slate-300">{admin.displayName}</span>
-              <span class="text-xs text-slate-500">@{admin.username}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-        <h3 class="text-sm font-semibold text-white mb-2">All Users ({_allUsers.length})</h3>
-        <ul class="space-y-2">
-          {_allUsers.map((user) => (
-            <li class="flex items-center gap-2 text-sm">
-              <span class={`w-2 h-2 rounded-full ${user.role === "admin" ? "bg-amber-400" : "bg-blue-400"}`}></span>
-              <span class="text-slate-300">{user.displayName}</span>
-              <span class="text-xs text-slate-500">({user.role})</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-    {_userIsAdmin && (
-      <div class="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
-        <p class="text-sm text-amber-200">
-          🔧 <strong>Admin Privileges:</strong> You can access the moderation console and manage content.
-          Only admin users see the "Admin" link in the navigation.
-        </p>
-      </div>
-    )}
-  </section>
+  <UserRoles client:load />
 
   <RealtimeControls client:load />
 
