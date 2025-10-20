@@ -1,16 +1,18 @@
 import { Alert, Button, Input } from "@components/ui";
-import { authStore, signInUser, signOutUser, signUpUser } from "@services/auth";
+import { authStore, signInUser, signOutUser, signUpUser, confirmSignUpCode } from "@services/auth";
 import { useEffect, useState } from "preact/hooks";
 
-type AuthMode = "signin" | "signup";
+type AuthMode = "signin" | "signup" | "confirm";
 
 export function AuthForm() {
   const [mode, setMode] = useState<AuthMode>("signin");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmationCode, setConfirmationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const authState = authStore.get();
 
@@ -25,12 +27,22 @@ export function AuthForm() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
       if (mode === "signin") {
         await signInUser(username, password);
-      } else {
-        await signUpUser(username, password, email);
+      } else if (mode === "signup") {
+        const result = await signUpUser(username, password, email);
+        if (result.requiresConfirmation) {
+          setMode("confirm");
+          setSuccessMessage("✅ Check your email for confirmation code!");
+        }
+      } else if (mode === "confirm") {
+        await confirmSignUpCode(username, confirmationCode);
+        setSuccessMessage("✅ Email confirmed! Now sign in.");
+        setMode("signin");
+        setConfirmationCode("");
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Authentication failed");
@@ -61,68 +73,94 @@ export function AuthForm() {
   return (
     <div>
       <form onSubmit={handleSubmit} class="grid gap-4">
-        {mode === "signup" && (
-          <div class="grid gap-2 text-sm">
-            <label htmlFor="email">Email</label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
+        {mode === "confirm" ? (
+          // Confirmation code form
+          <>
+            <div class="grid gap-2 text-sm">
+              <label htmlFor="confirmationCode">Confirmation Code</label>
+              <Input
+                id="confirmationCode"
+                type="text"
+                placeholder="123456"
+                value={confirmationCode}
+                onInput={(e) => setConfirmationCode((e.target as HTMLInputElement).value)}
+                required
+                disabled={isLoading}
+              />
+              <p class="text-xs text-slate-400">Enter the 6-digit code sent to {email}</p>
+            </div>
+          </>
+        ) : (
+          // Sign in / Sign up form
+          <>
+            {mode === "signup" && (
+              <div class="grid gap-2 text-sm">
+                <label htmlFor="email">Email</label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+
+            <div class="grid gap-2 text-sm">
+              <label htmlFor="username">Username</label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="your-username"
+                value={username}
+                onInput={(e) => setUsername((e.target as HTMLInputElement).value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div class="grid gap-2 text-sm">
+              <label htmlFor="password">Password</label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </>
         )}
 
-        <div class="grid gap-2 text-sm">
-          <label htmlFor="username">Username</label>
-          <Input
-            id="username"
-            type="text"
-            placeholder="your-username"
-            value={username}
-            onInput={(e) => setUsername((e.target as HTMLInputElement).value)}
-            required
-            disabled={isLoading}
-          />
-        </div>
-
-        <div class="grid gap-2 text-sm">
-          <label htmlFor="password">Password</label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
-            required
-            disabled={isLoading}
-          />
-        </div>
-
         {error && <Alert variant="danger">{error}</Alert>}
+        {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
         <Button type="submit" disabled={isLoading} loading={isLoading}>
-          {mode === "signin" ? "Sign In" : "Sign Up"}
+          {mode === "signin" ? "Sign In" : mode === "signup" ? "Sign Up" : "Confirm Email"}
         </Button>
       </form>
 
-      <div class="mt-6 text-center">
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setError(null);
-          }}
-          disabled={isLoading}
-        >
-          {mode === "signin"
-            ? "Don't have an account? Sign up"
-            : "Already have an account? Sign in"}
-        </Button>
-      </div>
+      {mode !== "confirm" && (
+        <div class="mt-6 text-center">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setMode(mode === "signin" ? "signup" : "signin");
+              setError(null);
+              setSuccessMessage(null);
+            }}
+            disabled={isLoading}
+          >
+            {mode === "signin"
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Sign in"}
+          </Button>
+        </div>
+      )}
 
       <div class="mt-6 grid gap-3 text-sm">
         <Button variant="secondary" disabled={isLoading}>

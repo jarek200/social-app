@@ -1,4 +1,11 @@
-import { fetchAuthSession, getCurrentUser, signIn, signOut, signUp } from "aws-amplify/auth";
+import { 
+  fetchAuthSession, 
+  getCurrentUser, 
+  signIn, 
+  signOut, 
+  signUp,
+  confirmSignUp 
+} from "aws-amplify/auth";
 import { atom } from "nanostores";
 
 export type User = {
@@ -100,12 +107,18 @@ export const signUpUser = async (username: string, password: string, email: stri
 
     if (isSignUpComplete) {
       authStore.set({ ...authStore.get(), isLoading: false, error: null });
+      return { success: true, requiresConfirmation: false };
     } else {
       authStore.set({
         ...authStore.get(),
         isLoading: false,
-        error: `Sign up requires: ${nextStep.signUpStep}`,
+        error: null,
       });
+      return { 
+        success: true, 
+        requiresConfirmation: true,
+        nextStep: nextStep.signUpStep 
+      };
     }
   } catch (error) {
     authStore.set({
@@ -113,6 +126,37 @@ export const signUpUser = async (username: string, password: string, email: stri
       isLoading: false,
       error: error instanceof Error ? error.message : "Sign up failed",
     });
+    throw error;
+  }
+};
+
+export const confirmSignUpCode = async (username: string, code: string) => {
+  try {
+    authStore.set({ ...authStore.get(), isLoading: true, error: null });
+
+    const { isSignUpComplete } = await confirmSignUp({
+      username,
+      confirmationCode: code,
+    });
+
+    if (isSignUpComplete) {
+      authStore.set({ ...authStore.get(), isLoading: false, error: null });
+      return { success: true };
+    }
+
+    authStore.set({
+      ...authStore.get(),
+      isLoading: false,
+      error: "Confirmation incomplete",
+    });
+    return { success: false };
+  } catch (error) {
+    authStore.set({
+      ...authStore.get(),
+      isLoading: false,
+      error: error instanceof Error ? error.message : "Confirmation failed",
+    });
+    throw error;
   }
 };
 
