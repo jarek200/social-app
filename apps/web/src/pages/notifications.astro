@@ -5,7 +5,7 @@ import { AuthGuard } from "@components/AuthGuard";
 import { NotificationList } from "@components/NotificationList";
 
 // Check if we're in demo mode
-const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 ---
 
 <BaseLayout title="Notifications">

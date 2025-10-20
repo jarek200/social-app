@@ -10,8 +10,7 @@ export function PostDetail({ postId }: PostDetailProps) {
   const [loading, setLoading] = useState(true);
 
   // Check for demo mode
-  const isDemoMode =
-    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+  const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
   useEffect(() => {
     const loadPost = async () => {

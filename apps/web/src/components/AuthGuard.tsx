@@ -29,9 +29,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return unsubscribe;
   }, []);
 
-  // Check for demo mode
-  const isDemoMode =
-    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_COGNITO_USER_POOL_ID;
+  // Check for demo mode - only enable if explicitly set
+  const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
   // If demo mode is enabled, allow access
   if (isDemoMode) {

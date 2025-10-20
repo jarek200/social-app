@@ -13,8 +13,7 @@ export function UserProfile({ username }: UserProfileProps) {
   const currentUserId = "user-2"; // Demo: Noah is logged in
 
   // Check for demo mode
-  const isDemoMode =
-    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+  const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
   useEffect(() => {
     const loadProfile = async () => {

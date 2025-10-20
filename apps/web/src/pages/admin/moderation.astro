@@ -4,7 +4,7 @@ import ModerationPanel from "@components/ModerationPanel.astro";
 import { AuthGuard } from "@components/AuthGuard";
 
 // Check if we're in demo mode
-const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
 // Only check admin status in demo mode
 if (isDemoMode) {

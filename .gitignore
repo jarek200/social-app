@@ -17,6 +17,12 @@ tmp
 # Env files
 .env
 .env.*
+!.env.local.example
+
+# Local development data
+local-data/
+*.db
+*.sqlite
 
 # OS
 .DS_Store

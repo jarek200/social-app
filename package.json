@@ -12,7 +12,11 @@
     "lint": "nx lint web",
     "test": "nx test web",
     "check": "nx format:check && pnpm run lint && pnpm run test",
-    "format": "nx format:write"
+    "format": "nx format:write",
+    "local:start": "docker-compose up -d && ./scripts/setup-local-dynamodb.sh",
+    "local:stop": "docker-compose down",
+    "local:reset": "docker-compose down -v && rm -rf ./local-data && pnpm run local:start",
+    "local:logs": "docker-compose logs -f"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.554.0",

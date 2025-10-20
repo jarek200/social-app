@@ -30,8 +30,7 @@ export function LogoutButton() {
   };
 
   // Check for demo mode from environment
-  const isDemoMode =
-    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_COGNITO_USER_POOL_ID;
+  const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
   if (!authState.isAuthenticated && !isDemoMode) {
     return null;

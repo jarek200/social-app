@@ -4,7 +4,7 @@ import { AuthGuard } from "@components/AuthGuard";
 import { UserProfile } from "@components/UserProfile";
 
 // Check if we're in demo mode for static generation
-const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
 // Only generate static paths in demo mode
 export async function getStaticPaths() {

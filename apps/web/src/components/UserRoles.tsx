@@ -8,8 +8,7 @@ export function UserRoles() {
   const [allUsers] = useState(listUsers());
 
   // Check for demo mode
-  const isDemoMode =
-    import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_APPSYNC_URL;
+  const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 
   // Don't show this component if not in demo mode
   if (!isDemoMode) {
