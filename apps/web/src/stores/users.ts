@@ -12,47 +12,8 @@ type UserProfile = {
   role: "admin" | "user";
 };
 
-const users: UserProfile[] = [
-  {
-    id: "user-1",
-    username: "ava",
-    displayName: "Ava Martinez",
-    avatarUrl: "https://i.pravatar.cc/150?img=47",
-    bio: "Product + ops, building resilient social pipelines.",
-    followers: 1203,
-    following: 342,
-    followingIds: ["user-2", "user-3"], // Ava follows Noah and Priya
-    followerIds: ["user-2"], // Noah follows Ava
-    posts: 58,
-    role: "user",
-  },
-  {
-    id: "user-2",
-    username: "noah",
-    displayName: "Noah Chen",
-    avatarUrl: "https://i.pravatar.cc/150?img=15",
-    bio: "SRE with a camera. Watching dashboards + sunsets.",
-    followers: 987,
-    following: 421,
-    followingIds: ["user-1", "user-3"], // Noah follows Ava and Priya
-    followerIds: ["user-1", "user-3"], // Ava and Priya follow Noah
-    posts: 44,
-    role: "admin", // Make Noah an admin
-  },
-  {
-    id: "user-3",
-    username: "priya",
-    displayName: "Priya Patel",
-    avatarUrl: "https://i.pravatar.cc/150?img=32",
-    bio: "Automation engineer. Shipping workflows faster than light.",
-    followers: 1643,
-    following: 289,
-    followingIds: ["user-2"], // Priya follows Noah
-    followerIds: ["user-1", "user-2"], // Ava and Noah follow Priya
-    posts: 72,
-    role: "user",
-  },
-];
+// Empty initial state - data loaded from backend or demo mode
+const users: UserProfile[] = [];
 
 export const findUserByUsername = (username: string) =>
   users.find((user) => user.username.toLowerCase() === username.toLowerCase());

@@ -20,43 +20,8 @@ export type FeedItem = {
   }>;
 };
 
-// Seed with demo data to highlight real-time UX without requiring a backend connected yet.
-const seedItems: FeedItem[] = [
-  {
-    id: "post-1000",
-    authorId: "user-1",
-    authorName: "Ava Martinez",
-    caption: "Sunset vibes from the Seattle waterfront 🌅",
-    imageUrl:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    likes: 42,
-    likedByViewer: false,
-    moderationStatus: "APPROVED",
-    createdAt: new Date(Date.now() - 3600 * 1000).toISOString(),
-    comments: [
-      {
-        id: "comment-1",
-        authorId: "user-2",
-        authorName: "Noah Chen",
-        text: "This lighting is perfection 🔥",
-        createdAt: new Date(Date.now() - 3400 * 1000).toISOString(),
-      },
-    ],
-  },
-  {
-    id: "post-1001",
-    authorId: "user-3",
-    authorName: "Priya Patel",
-    caption: "Tuning pipeline observability dashboards before launch 🚀",
-    imageUrl:
-      "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80",
-    likes: 12,
-    likedByViewer: true,
-    moderationStatus: "PENDING",
-    createdAt: new Date(Date.now() - 2000 * 1000).toISOString(),
-    comments: [],
-  },
-];
+// Empty initial state - data loaded from backend or demo mode
+const seedItems: FeedItem[] = [];
 
 export const feedStore = atom<FeedItem[]>(seedItems);
 

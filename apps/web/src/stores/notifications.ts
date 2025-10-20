@@ -9,32 +9,8 @@ export type Notification = {
   read: boolean;
 };
 
-const seed: Notification[] = [
-  {
-    id: "notif-1",
-    type: "LIKE",
-    actor: "Priya Patel",
-    message: 'liked your post "Sunset vibes"',
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: "notif-2",
-    type: "COMMENT",
-    actor: "Noah Chen",
-    message: 'commented "Releasing tonight?"',
-    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: "notif-3",
-    type: "FOLLOW",
-    actor: "Maya Stone",
-    message: "started following you",
-    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-];
+// Empty initial state - data loaded from backend or demo mode
+const seed: Notification[] = [];
 
 export const notificationsStore = atom<Notification[]>(seed);
 
