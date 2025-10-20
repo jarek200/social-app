@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { authStore } from "@services/auth";
+import { authStore, initializeAuth } from "@services/auth";
 
 interface AuthGuardProps {
   children?: any;
@@ -7,10 +7,25 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const [authState, setAuthState] = useState(authStore.get());
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     // Subscribe to auth changes
     const unsubscribe = authStore.subscribe(setAuthState);
+    
+    // Initialize auth if not already done
+    const initAuth = async () => {
+      try {
+        await initializeAuth();
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Auth initialization failed:", error);
+        setIsInitialized(true);
+      }
+    };
+
+    initAuth();
+    
     return unsubscribe;
   }, []);
 
@@ -23,8 +38,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return <>{children}</>;
   }
 
-  // Show loading state while checking auth
-  if (authState.isLoading) {
+  // Show loading state while initializing or checking auth
+  if (!isInitialized || authState.isLoading) {
     return (
       <div class="flex min-h-screen items-center justify-center">
         <div class="text-center">
