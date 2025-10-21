@@ -1,10 +1,7 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
 import { AuthGuard } from "@components/AuthGuard";
 import { UserProfile } from "@components/UserProfile";
-
-// Check if we're in demo mode for static generation
-const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 // Only generate static paths in demo mode
 export async function getStaticPaths() {
@@ -12,7 +9,7 @@ export async function getStaticPaths() {
     const { listUsers } = await import("@stores/users");
     return listUsers().map((user) => ({
       params: { username: user.username },
-      props: { username: user.username, isDemoMode: true },
+      props: { username: user.username },
     }));
   }
   // In production, return empty array (will be SSR or client-side rendered)

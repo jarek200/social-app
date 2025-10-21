@@ -1,5 +1,6 @@
 import { Alert, Button, Input } from "@components/ui";
-import { authStore, signInUser, signOutUser, signUpUser, confirmSignUpCode } from "@services/auth";
+import { useStore } from "@nanostores/preact";
+import { authStore, confirmSignUpCode, signInUser, signOutUser, signUpUser } from "@services/auth";
 import { useEffect, useState } from "preact/hooks";
 
 type AuthMode = "signin" | "signup" | "confirm";
@@ -14,7 +15,7 @@ export function AuthForm() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const authState = authStore.get();
+  const authState = useStore(authStore);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -75,24 +76,22 @@ export function AuthForm() {
       <form onSubmit={handleSubmit} class="grid gap-4">
         {mode === "confirm" ? (
           // Confirmation code form
-          <>
-            <div class="grid gap-2 text-sm">
-              <label htmlFor="confirmationCode">Confirmation Code</label>
-              <Input
-                id="confirmationCode"
-                type="text"
-                placeholder="123456"
-                value={confirmationCode}
-                onInput={(e) => setConfirmationCode((e.target as HTMLInputElement).value)}
-                required
-                disabled={isLoading}
-              />
-              <p class="text-xs text-slate-400">Enter the 6-digit code sent to {email}</p>
-            </div>
-          </>
+          <div class="grid gap-2 text-sm">
+            <label htmlFor="confirmationCode">Confirmation Code</label>
+            <Input
+              id="confirmationCode"
+              type="text"
+              placeholder="123456"
+              value={confirmationCode}
+              onInput={(e) => setConfirmationCode((e.target as HTMLInputElement).value)}
+              required
+              disabled={isLoading}
+            />
+            <p class="text-xs text-slate-400">Enter the 6-digit code sent to {email}</p>
+          </div>
         ) : (
           // Sign in / Sign up form
-          <>
+          <div class="space-y-4">
             {mode === "signup" && (
               <div class="grid gap-2 text-sm">
                 <label htmlFor="email">Email</label>
@@ -133,7 +132,7 @@ export function AuthForm() {
                 disabled={isLoading}
               />
             </div>
-          </>
+          </div>
         )}
 
         {error && <Alert variant="danger">{error}</Alert>}

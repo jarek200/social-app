@@ -434,3 +434,4 @@ const toggleLike = async (postId, userId) => {
 ```
 
 This single table design efficiently supports all the social app's access patterns while maintaining good performance and cost optimization.
+

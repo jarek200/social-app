@@ -1,3 +1,4 @@
+import { getEnvironmentConfig } from "@utils/environment";
 import { getUrl, remove, uploadData } from "aws-amplify/storage";
 
 export type UploadProgress = {
@@ -16,13 +17,14 @@ export const uploadFile = async (
   onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadResult> => {
   try {
+    const envConfig = getEnvironmentConfig();
+
     const timestamp = Date.now();
     const fileExtension = file.name.split(".").pop();
     const key = `posts/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
     // Check if we're in demo mode
-    const isDemoMode =
-      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
+    const isDemoMode = envConfig.demoMode;
 
     if (isDemoMode) {
       // Demo mode: Create a local object URL
@@ -53,7 +55,7 @@ export const uploadFile = async (
     }
 
     // Production mode: Upload to S3
-    const uploadResult = await uploadData({
+    await uploadData({
       key,
       data: file,
       options: {
@@ -74,20 +76,18 @@ export const uploadFile = async (
         },
       },
     });
-    const result = uploadResult.result;
 
     // Get the public URL for the uploaded file
     const urlResult = await getUrl({
-      key: result.key,
+      key,
       options: {
         expiresIn: 3600, // 1 hour
       },
     });
-    const url = urlResult.result;
 
     return {
-      key: result.key,
-      url: url.url.toString(),
+      key,
+      url: urlResult.url.toString(),
     };
   } catch (error) {
     console.error("Upload failed:", error);
@@ -97,9 +97,8 @@ export const uploadFile = async (
 
 export const deleteFile = async (key: string): Promise<void> => {
   try {
-    // Check if we're in demo mode
-    const isDemoMode =
-      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
+    const envConfig = getEnvironmentConfig();
+    const isDemoMode = envConfig.demoMode;
 
     if (isDemoMode) {
       // Demo mode: Revoke object URL if it's a demo key
@@ -121,9 +120,8 @@ export const deleteFile = async (key: string): Promise<void> => {
 
 export const getFileUrl = async (key: string, expiresIn: number = 3600): Promise<string> => {
   try {
-    // Check if we're in demo mode
-    const isDemoMode =
-      import.meta.env.PUBLIC_DEMO_MODE === "true" || !import.meta.env.PUBLIC_S3_BUCKET;
+    const envConfig = getEnvironmentConfig();
+    const isDemoMode = envConfig.demoMode;
 
     if (isDemoMode) {
       // Demo mode: Return the key as-is if it's already a URL
@@ -141,9 +139,8 @@ export const getFileUrl = async (key: string, expiresIn: number = 3600): Promise
         expiresIn,
       },
     });
-    const result = urlResult.result;
 
-    return result.url.toString();
+    return urlResult.url.toString();
   } catch (error) {
     console.error("Get URL failed:", error);
     throw new Error(error instanceof Error ? error.message : "Get URL failed");

@@ -1,8 +1,8 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import { NotificationPermissions } from "@components/NotificationPermissions";
 import { AuthGuard } from "@components/AuthGuard";
 import { NotificationList } from "@components/NotificationList";
+import { NotificationPermissions } from "@components/NotificationPermissions";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 // Check if we're in demo mode
 const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";

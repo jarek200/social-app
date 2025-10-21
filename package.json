@@ -9,9 +9,12 @@
   "scripts": {
     "dev": "nx serve web",
     "build": "nx build web",
+    "build:dev": "NODE_ENV=development nx build web",
+    "build:staging": "NODE_ENV=staging nx build web",
+    "build:prod": "NODE_ENV=production nx build web",
     "lint": "nx lint web",
     "test": "nx test web",
-    "check": "nx format:check && pnpm run lint && pnpm run test",
+    "check": "pnpm exec biome check --formatter-enabled=true --linter-enabled=false --files-ignore-unknown=true && pnpm run lint && pnpm run test",
     "format": "nx format:write",
     "local:start": "docker-compose up -d && ./scripts/setup-local-dynamodb.sh",
     "local:stop": "docker-compose down",

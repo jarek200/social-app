@@ -1,5 +1,5 @@
-import { useEffect, useState } from "preact/hooks";
 import { getAdmins, isAdmin, listUsers } from "@stores/users";
+import { useEffect, useState } from "preact/hooks";
 
 export function UserRoles() {
   const currentUserId = "user-2"; // Demo admin
@@ -44,7 +44,9 @@ export function UserRoles() {
           <ul class="space-y-2">
             {allUsers.map((user) => (
               <li key={user.id} class="flex items-center gap-2 text-sm">
-                <span class={`w-2 h-2 rounded-full ${user.role === "admin" ? "bg-amber-400" : "bg-blue-400"}`}></span>
+                <span
+                  class={`w-2 h-2 rounded-full ${user.role === "admin" ? "bg-amber-400" : "bg-blue-400"}`}
+                ></span>
                 <span class="text-slate-300">{user.displayName}</span>
                 <span class="text-xs text-slate-500">({user.role})</span>
               </li>
@@ -55,12 +57,11 @@ export function UserRoles() {
       {userIsAdmin && (
         <div class="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
           <p class="text-sm text-amber-200">
-            🔧 <strong>Admin Privileges:</strong> You can access the moderation console and manage content.
-            Only admin users see the "Admin" link in the navigation.
+            🔧 <strong>Admin Privileges:</strong> You can access the moderation console and manage
+            content. Only admin users see the "Admin" link in the navigation.
           </p>
         </div>
       )}
     </section>
   );
 }
-

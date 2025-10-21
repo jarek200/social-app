@@ -1,5 +1,5 @@
-import { useEffect, useState } from "preact/hooks";
 import { findUserByUsername, getPostsByAuthor } from "@stores/users";
+import { useEffect, useState } from "preact/hooks";
 import { FollowButton } from "./FollowButton";
 
 interface UserProfileProps {
@@ -21,7 +21,7 @@ export function UserProfile({ username }: UserProfileProps) {
         // Use demo data
         const { findUserByUsername, getPostsByAuthor } = await import("@stores/users");
         const { getPostsByAuthor: getFeedPosts } = await import("@stores/feed");
-        
+
         const userProfile = findUserByUsername(username);
         if (userProfile) {
           setProfile(userProfile);
@@ -60,7 +60,11 @@ export function UserProfile({ username }: UserProfileProps) {
     <section class="grid gap-6 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
       <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="flex items-center gap-4">
-          <img src={profile.avatarUrl} alt={profile.displayName} class="h-16 w-16 rounded-full object-cover" />
+          <img
+            src={profile.avatarUrl}
+            alt={profile.displayName}
+            class="h-16 w-16 rounded-full object-cover"
+          />
           <div>
             <h1 class="text-2xl font-semibold text-white">{profile.displayName}</h1>
             <p class="text-sm text-slate-400">@{profile.username}</p>
@@ -68,7 +72,10 @@ export function UserProfile({ username }: UserProfileProps) {
           </div>
         </div>
         <div class="flex gap-3">
-          <button class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200" type="button">
+          <button
+            class="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-brand-400 hover:text-brand-200"
+            type="button"
+          >
             Message
           </button>
           <FollowButton targetUserId={profile.id} currentUserId={currentUserId} />
@@ -97,7 +104,9 @@ export function UserProfile({ username }: UserProfileProps) {
             <li key={post.id} class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
               <a href={`/post/${post.id}`} class="text-white">
                 <h3 class="text-sm font-semibold">{post.caption}</h3>
-                <p class="text-xs text-slate-400">Likes: {post.likes} · Comments: {post.comments.length}</p>
+                <p class="text-xs text-slate-400">
+                  Likes: {post.likes} · Comments: {post.comments.length}
+                </p>
               </a>
             </li>
           ))}
@@ -107,4 +116,3 @@ export function UserProfile({ username }: UserProfileProps) {
     </section>
   );
 }
-

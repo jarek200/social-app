@@ -1,10 +1,14 @@
+import { initializeEnvironment } from "@utils/environment";
 import { Amplify } from "aws-amplify";
+
+// Initialize environment configuration
+const envConfig = initializeEnvironment();
 
 const amplifyConfig = {
   Auth: {
     Cognito: {
-      userPoolId: import.meta.env.PUBLIC_COGNITO_USER_POOL_ID,
-      userPoolClientId: import.meta.env.PUBLIC_COGNITO_USER_POOL_CLIENT_ID,
+      userPoolId: envConfig.cognitoUserPoolId,
+      userPoolClientId: envConfig.cognitoClientId,
       loginWith: {
         email: true,
         username: true,
@@ -13,22 +17,28 @@ const amplifyConfig = {
   },
   API: {
     GraphQL: {
-      endpoint: import.meta.env.PUBLIC_APPSYNC_URL,
-      region: import.meta.env.PUBLIC_AWS_REGION,
-      defaultAuthMode: "userPool",
+      endpoint: envConfig.apiUrl,
+      region: envConfig.region,
+      defaultAuthMode: "userPool" as const,
     },
   },
   Storage: {
     S3: {
-      bucket: import.meta.env.PUBLIC_S3_BUCKET,
-      region: import.meta.env.PUBLIC_AWS_REGION,
+      bucket: envConfig.s3Bucket,
+      region: envConfig.region,
     },
   },
 };
 
 // Only configure Amplify if we have the required environment variables
-if (import.meta.env.PUBLIC_APPSYNC_URL && import.meta.env.PUBLIC_COGNITO_USER_POOL_ID) {
+if (envConfig.apiUrl && envConfig.cognitoUserPoolId) {
   Amplify.configure(amplifyConfig);
+
+  if (envConfig.debugMode) {
+    console.log("🔧 Amplify configured for environment:", envConfig.environment);
+  }
+} else {
+  console.warn("⚠️ Amplify not configured - missing required environment variables");
 }
 
-export { amplifyConfig };
+export { amplifyConfig, envConfig };

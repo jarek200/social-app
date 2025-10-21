@@ -1,10 +1,11 @@
+import { useStore } from "@nanostores/preact";
 import { authStore, signOutUser } from "@services/auth";
 import { cleanupData } from "@services/dataService";
 import { useState } from "preact/hooks";
 
 export function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
-  const authState = authStore.get();
+  const authState = useStore(authStore);
 
   const handleLogout = async () => {
     if (!confirm("Are you sure you want to sign out?")) {

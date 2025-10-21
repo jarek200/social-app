@@ -68,7 +68,13 @@ export function SearchBar(): JSX.Element {
           class="w-full rounded-full border border-white/10 bg-slate-950/60 px-4 py-2 pl-10 text-white placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
         />
         <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-          <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Search icon">
+          <svg
+            class="h-4 w-4 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-label="Search icon"
+          >
             <title>Search</title>
             <path
               stroke-linecap="round"

@@ -1,7 +1,7 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import ModerationPanel from "@components/ModerationPanel.astro";
 import { AuthGuard } from "@components/AuthGuard";
+import ModerationPanel from "@components/ModerationPanel.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 // Check if we're in demo mode
 const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
@@ -10,7 +10,7 @@ const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 if (isDemoMode) {
   const { isAdmin } = await import("@stores/users");
   const currentUserId = "user-2"; // Demo admin
-  
+
   if (!isAdmin(currentUserId)) {
     throw new Error("Access denied: Admin privileges required");
   }

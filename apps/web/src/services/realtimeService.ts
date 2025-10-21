@@ -27,21 +27,29 @@ export const realtimeOperations = {
       }
 
       // Connect to new feed
-      currentSubscription = subscriptions.onFeedEvent(feedId, (data: { postId: string; type: string; payload: Record<string, unknown>; createdAt: string }) => {
-        const event: FeedEvent = {
-          postId: data.postId,
-          type: data.type,
-          payload: data.payload,
-          createdAt: data.createdAt,
-        };
+      currentSubscription = subscriptions.onFeedEvent(
+        feedId,
+        (data: {
+          postId: string;
+          type: string;
+          payload: Record<string, unknown>;
+          createdAt: string;
+        }) => {
+          const event: FeedEvent = {
+            postId: data.postId,
+            type: data.type,
+            payload: data.payload,
+            createdAt: data.createdAt,
+          };
 
-        // Add to events store
-        const currentEvents = realtimeEventsStore.get();
-        realtimeEventsStore.set([event, ...currentEvents.slice(0, 49)]); // Keep last 50 events
+          // Add to events store
+          const currentEvents = realtimeEventsStore.get();
+          realtimeEventsStore.set([event, ...currentEvents.slice(0, 49)]); // Keep last 50 events
 
-        // Handle different event types
-        this.handleFeedEvent(event);
-      });
+          // Handle different event types
+          this.handleFeedEvent(event);
+        },
+      );
 
       isConnectedStore.set(true);
       connectionErrorStore.set(null);

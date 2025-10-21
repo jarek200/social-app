@@ -1,10 +1,10 @@
-import { 
-  fetchAuthSession, 
-  getCurrentUser, 
-  signIn, 
-  signOut, 
+import {
+  confirmSignUp,
+  fetchAuthSession,
+  getCurrentUser,
+  signIn,
+  signOut,
   signUp,
-  confirmSignUp 
 } from "aws-amplify/auth";
 import { atom } from "nanostores";
 
@@ -114,10 +114,10 @@ export const signUpUser = async (username: string, password: string, email: stri
         isLoading: false,
         error: null,
       });
-      return { 
-        success: true, 
+      return {
+        success: true,
         requiresConfirmation: true,
-        nextStep: nextStep.signUpStep 
+        nextStep: nextStep.signUpStep,
       };
     }
   } catch (error) {

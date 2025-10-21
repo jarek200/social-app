@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
-import { postsStore } from "@services/dataService";
 import { getRealtimeMetrics } from "@services/analyticsService";
+import { postsStore } from "@services/dataService";
+import { useEffect, useState } from "preact/hooks";
 
 export function DashboardMetrics() {
   const [posts, setPosts] = useState(postsStore.get());
@@ -9,7 +9,7 @@ export function DashboardMetrics() {
   useEffect(() => {
     // Subscribe to posts store
     const unsubscribePosts = postsStore.subscribe(setPosts);
-    
+
     // Update metrics periodically
     const interval = setInterval(() => {
       setMetrics(getRealtimeMetrics());
@@ -40,4 +40,3 @@ export function DashboardMetrics() {
     </ul>
   );
 }
-

@@ -57,7 +57,10 @@ export function RealtimeControls(): JSX.Element {
           <div class="text-xs text-slate-400">Recent events ({realtimeEvents.length})</div>
           <div class="max-h-32 overflow-y-auto space-y-1">
             {realtimeEvents.slice(0, 5).map((event) => (
-              <div key={`${event.postId}-${event.createdAt}`} class="text-xs text-slate-300 bg-slate-800/30 rounded px-2 py-1">
+              <div
+                key={`${event.postId}-${event.createdAt}`}
+                class="text-xs text-slate-300 bg-slate-800/30 rounded px-2 py-1"
+              >
                 <span class="text-emerald-400">{event.type}</span> on post {event.postId.slice(-8)}
               </div>
             ))}

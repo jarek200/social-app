@@ -1,8 +1,16 @@
-import { useEffect, useState } from "preact/hooks";
 import { getNotificationSnapshot } from "@stores/notifications";
+import { useEffect, useState } from "preact/hooks";
+
+type Notification = {
+  id: string;
+  type: "like" | "comment" | "follow";
+  message: string;
+  read: boolean;
+  createdAt: string;
+};
 
 export function NotificationList() {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Check for demo mode
@@ -57,7 +65,9 @@ export function NotificationList() {
               <p class="font-semibold text-white">{notif.actor}</p>
               <p class="text-slate-300">{notif.message}</p>
             </div>
-            <span class="text-xs text-slate-500">{new Date(notif.createdAt).toLocaleTimeString()}</span>
+            <span class="text-xs text-slate-500">
+              {new Date(notif.createdAt).toLocaleTimeString()}
+            </span>
           </li>
         ))}
         {notifications.length === 0 && (
@@ -67,4 +77,3 @@ export function NotificationList() {
     </section>
   );
 }
-

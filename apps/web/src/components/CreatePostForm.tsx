@@ -1,4 +1,5 @@
 import { Alert, Button, Textarea } from "@components/ui";
+import { useStore } from "@nanostores/preact";
 import { authStore } from "@services/auth";
 import { savePost } from "@services/dataService";
 import { useState } from "preact/hooks";
@@ -16,7 +17,7 @@ export function CreatePostForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const authState = authStore.get();
+  const authState = useStore(authStore);
 
   const handleUploadComplete = (result: UploadResult) => {
     setUploadResult(result);

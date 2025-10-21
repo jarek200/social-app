@@ -82,12 +82,11 @@ export const createPost = async (input: {
       });
       return newPost;
     } else {
-      // Use real AppSync
-      const newPost = await mutations.createPost(input);
-      // Add to store optimistically
-      const currentPosts = postsStore.get();
-      postsStore.set([newPost, ...currentPosts]);
-      return newPost;
+      // Use real AppSync - savePost triggers Step Functions workflow
+      const postId = await mutations.savePost(input);
+      // The post will be added to the feed via Step Functions workflow
+      // and real-time subscription will update the UI
+      return { id: postId } as Post;
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to create post";
@@ -109,16 +108,41 @@ export const savePost = async (input: {
     isLoadingStore.set(true);
     errorStore.set(null);
 
+    // Optimistic insert: show the post immediately as PENDING
+    const now = new Date().toISOString();
+    const tempId = `temp-${Date.now()}`;
+    const currentPosts = postsStore.get();
+    const viewer = authStore.get().user?.id || "viewer";
+    const optimisticPost: Post = {
+      id: tempId,
+      caption: input.caption,
+      photoUrl: input.photoUrl,
+      moderationStatus: "PENDING",
+      likeCount: 0,
+      commentCount: 0,
+      createdAt: now,
+      owner: viewer,
+      feedId: input.feedId ?? "GLOBAL",
+    };
+    postsStore.set([optimisticPost, ...currentPosts]);
+
+    // Persist via backend
     const postId = await mutations.savePost(input);
 
-    // The post will be added to the feed via the Step Functions workflow
-    // and real-time subscription will update the UI
+    // Update temp item with real id to avoid duplicates when backend updates arrive
+    const updated = postsStore.get().map((p) => (p.id === tempId ? { ...p, id: postId } : p));
+    postsStore.set(updated);
 
+    // The post will be updated via the Step Functions workflow and subscriptions
     return postId;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to save post";
     errorStore.set(errorMessage);
     console.error("Save post error:", error);
+
+    // Rollback optimistic insert on error
+    postsStore.set(postsStore.get().filter((p) => !p.id.startsWith("temp-")));
+
     throw error;
   } finally {
     isLoadingStore.set(false);
@@ -200,47 +224,49 @@ export const toggleLike = async (postId: string) => {
 // Real-time subscriptions
 let feedSubscription: { unsubscribe: () => void } | null = null;
 
-export const subscribeToFeed = (feedId: string = "GLOBAL") => {
+export const subscribeToFeed = async (feedId: string = "GLOBAL") => {
   // Clean up existing subscription
   if (feedSubscription) {
     feedSubscription.unsubscribe();
   }
 
-  feedSubscription = subscriptions.onFeedEvent(feedId, (data) => {
-    console.log("Feed event received:", data);
+  const handle = await subscriptions.onFeedEvent(feedId, (event) => {
+    console.log("Feed event received:", event);
 
-    if (data.data?.onFeedEvent) {
-      const event = data.data.onFeedEvent;
-
-      switch (event.type) {
-        case "POST_CREATED":
-        case "POST_UPDATED":
-          // Refresh the feed to get the latest posts
-          loadFeed(feedId);
-          break;
-        case "MODERATION_UPDATED": {
-          // Update post moderation status
-          const currentPosts = postsStore.get();
-          postsStore.set(
-            currentPosts.map((post) =>
-              post.id === event.postId ? { ...post, moderationStatus: event.payload.status } : post,
-            ),
-          );
-          break;
-        }
-        case "COMMENT_CREATED":
-          // Refresh comments for the post
-          loadComments(event.postId);
-          break;
-        case "LIKE_UPDATED":
-          // Refresh likes for the post
-          // Could implement more granular updates here
-          break;
+    switch (event.type) {
+      case "POST_CREATED":
+      case "POST_UPDATED":
+        // Refresh the feed to get the latest posts
+        loadFeed(feedId);
+        break;
+      case "MODERATION_UPDATED": {
+        // Update post moderation status
+        const currentPosts = postsStore.get();
+        postsStore.set(
+          currentPosts.map((post) =>
+            post.id === event.postId
+              ? {
+                  ...post,
+                  moderationStatus: (event.payload as { status: Post["moderationStatus"] }).status,
+                }
+              : post,
+          ),
+        );
+        break;
       }
+      case "COMMENT_CREATED":
+        // Refresh comments for the post
+        loadComments(event.postId);
+        break;
+      case "LIKE_UPDATED":
+        // Refresh likes for the post
+        // Could implement more granular updates here
+        break;
     }
   });
 
-  return feedSubscription;
+  feedSubscription = handle;
+  return handle;
 };
 
 export const unsubscribeFromFeed = () => {
@@ -256,7 +282,7 @@ export const initializeData = async () => {
 
   if (authState.isAuthenticated) {
     await loadFeed();
-    subscribeToFeed();
+    await subscribeToFeed();
   }
 };
 

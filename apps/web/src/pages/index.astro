@@ -1,12 +1,12 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
-import ModerationPanel from "@components/ModerationPanel.astro";
-import DashboardSidebar from "@components/DashboardSidebar.astro";
-import { RealtimeControls } from "@components/RealtimeControls";
-import { FeedIsland } from "@components/FeedIsland";
 import { AuthGuard } from "@components/AuthGuard";
 import { DashboardMetrics } from "@components/DashboardMetrics";
+import DashboardSidebar from "@components/DashboardSidebar.astro";
+import { FeedIsland } from "@components/FeedIsland";
+import ModerationPanel from "@components/ModerationPanel.astro";
+import { RealtimeControls } from "@components/RealtimeControls";
 import { UserRoles } from "@components/UserRoles";
+import BaseLayout from "@layouts/BaseLayout.astro";
 
 // Check if we're in demo mode
 const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";

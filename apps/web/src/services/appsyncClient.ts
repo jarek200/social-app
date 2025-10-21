@@ -5,6 +5,7 @@ type PostRecord = {
   id: string;
   caption: string;
   photoUrl: string;
+  photoStorageKey: string;
   moderationStatus: "PENDING" | "APPROVED" | "REJECTED";
   likeCount: number;
   commentCount: number;
@@ -110,33 +111,6 @@ export const mutations = {
     return data.savePost.postId;
   },
 
-  async createPost(input: {
-    caption: string;
-    photoStorageKey: string;
-    photoUrl: string;
-    feedId?: string;
-  }): Promise<PostRecord> {
-    const data = await callGraphQL<{ createPost: PostRecord }>(
-      /* GraphQL */ `
-        mutation CreatePost($input: CreatePostInput!) {
-          createPost(input: $input) {
-            id
-            caption
-            photoUrl
-            moderationStatus
-            likeCount
-            commentCount
-            createdAt
-            owner
-            feedId
-          }
-        }
-      `,
-      { input },
-    );
-    return data.createPost;
-  },
-
   async createComment(input: { postId: string; body: string }): Promise<CommentRecord> {
     const data = await callGraphQL<{ createComment: CommentRecord }>(
       /* GraphQL */ `
@@ -197,6 +171,7 @@ export const queries = {
               id
               caption
               photoUrl
+              photoStorageKey
               moderationStatus
               likeCount
               commentCount
@@ -221,6 +196,7 @@ export const queries = {
             id
             caption
             photoUrl
+            photoStorageKey
             moderationStatus
             likeCount
             commentCount
@@ -278,7 +254,15 @@ export const queries = {
 // Real-time subscriptions
 export const subscriptions = {
   async onFeedEvent(feedId: string, callback: (data: FeedEventData) => void) {
-    const subscription = await client.graphql({
+    type SubscriptionHandle = { unsubscribe: () => void };
+    type SubscriptionLike = {
+      subscribe: (handlers: {
+        next: (data: { data?: { onFeedEvent?: FeedEventData } }) => void;
+        error: (err: unknown) => void;
+      }) => SubscriptionHandle;
+    };
+
+    const subscription = (await client.graphql({
       query: /* GraphQL */ `
         subscription OnFeedEvent($feedId: ID!) {
           onFeedEvent(feedId: $feedId) {
@@ -291,11 +275,17 @@ export const subscriptions = {
       `,
       variables: { feedId },
       authMode: "userPool",
-    });
+    })) as unknown as SubscriptionLike;
 
-    return subscription.subscribe({
-      next: (data: FeedEventData) => callback(data),
+    const sub = subscription.subscribe({
+      next: (result: { data?: { onFeedEvent?: FeedEventData } }) => {
+        if (result.data?.onFeedEvent) {
+          callback(result.data.onFeedEvent);
+        }
+      },
       error: (error: unknown) => console.error("Subscription error:", error),
     });
+
+    return { unsubscribe: () => sub.unsubscribe() };
   },
 };
