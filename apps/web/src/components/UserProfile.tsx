@@ -30,9 +30,21 @@ export function UserProfile({ username }: UserProfileProps) {
         }
       } else {
         // In production, fetch from AppSync
-        // TODO: Implement real user profile fetching
-        setProfile(null);
-        setPosts([]);
+        try {
+          // Fetch user profile by username
+          const { queries } = await import("@services/appsyncClient");
+          const userProfile = await queries.getUserByUsername(username);
+          if (userProfile) {
+            setProfile(userProfile);
+            // Fetch user's posts
+            const userPosts = await queries.getPostsByAuthor(userProfile.id);
+            setPosts(userPosts);
+          }
+        } catch (error) {
+          // User not found or error fetching
+          setProfile(null);
+          setPosts([]);
+        }
       }
       setLoading(false);
     };

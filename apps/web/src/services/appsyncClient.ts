@@ -57,7 +57,6 @@ async function _getAuthHeaders() {
       Authorization: session.tokens?.idToken?.toString() || "",
     };
   } catch (error) {
-    console.warn("No auth session available:", error);
     return {};
   }
 }
@@ -86,7 +85,6 @@ async function callGraphQL<TData, TVariables = Record<string, unknown>>(
 
     throw new Error("Invalid GraphQL result format");
   } catch (error) {
-    console.error("GraphQL request failed:", error);
     throw error;
   }
 }
@@ -249,6 +247,57 @@ export const queries = {
     );
     return data.myProfile;
   },
+
+  async getUserByUsername(username: string): Promise<ProfileRecord | null> {
+    const data = await callGraphQL<{ getUserByUsername: ProfileRecord | null }>(
+      /* GraphQL */ `
+        query GetUserByUsername($username: String!) {
+          getUserByUsername(username: $username) {
+            id
+            handle
+            displayName
+            avatarUrl
+            bio
+            createdAt
+            updatedAt
+          }
+        }
+      `,
+      { username },
+    );
+    return data.getUserByUsername;
+  },
+
+  async getPostsByAuthor(authorId: string): Promise<PostRecord[]> {
+    const data = await callGraphQL<{ listPostsByOwner: { items: PostRecord[] } }>(
+      /* GraphQL */ `
+        query GetPostsByAuthor($owner: ID!, $sortDirection: ModelSortDirection) {
+          listPostsByOwner(owner: $owner, sortDirection: $sortDirection, limit: 20) {
+            items {
+              id
+              caption
+              photoUrl
+              photoStorageKey
+              moderationStatus
+              likeCount
+              commentCount
+              createdAt
+              owner
+              feedId
+            }
+          }
+        }
+      `,
+      { owner: authorId, sortDirection: "DESC" },
+    );
+    return data.listPostsByOwner.items;
+  },
+
+  async getUserNotifications(): Promise<any[]> {
+    // This would need to be implemented in the GraphQL schema
+    // For now, return empty array as notifications aren't in the current schema
+    return [];
+  },
 };
 
 // Real-time subscriptions
@@ -283,7 +332,9 @@ export const subscriptions = {
           callback(result.data.onFeedEvent);
         }
       },
-      error: (error: unknown) => console.error("Subscription error:", error),
+      error: (error: unknown) => {
+        // Subscription error handled silently
+      },
     });
 
     return { unsubscribe: () => sub.unsubscribe() };

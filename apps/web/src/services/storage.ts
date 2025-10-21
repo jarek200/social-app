@@ -90,7 +90,6 @@ export const uploadFile = async (
       url: urlResult.url.toString(),
     };
   } catch (error) {
-    console.error("Upload failed:", error);
     throw new Error(error instanceof Error ? error.message : "Upload failed");
   }
 };
@@ -105,7 +104,6 @@ export const deleteFile = async (key: string): Promise<void> => {
       if (key.startsWith("demo-")) {
         // In demo mode, we can't actually delete the object URL
         // but we can log it for debugging
-        console.log(`Demo mode: Would delete file ${key}`);
         return;
       }
     }
@@ -113,7 +111,6 @@ export const deleteFile = async (key: string): Promise<void> => {
     // Production mode: Delete from S3
     await remove({ key });
   } catch (error) {
-    console.error("Delete failed:", error);
     throw new Error(error instanceof Error ? error.message : "Delete failed");
   }
 };
@@ -142,7 +139,6 @@ export const getFileUrl = async (key: string, expiresIn: number = 3600): Promise
 
     return urlResult.url.toString();
   } catch (error) {
-    console.error("Get URL failed:", error);
     throw new Error(error instanceof Error ? error.message : "Get URL failed");
   }
 };

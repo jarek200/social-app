@@ -23,8 +23,14 @@ export function NotificationList() {
         setNotifications(getNotificationSnapshot());
       } else {
         // In production, fetch from AppSync
-        // TODO: Implement real notification fetching
-        setNotifications([]);
+        try {
+          const { queries } = await import("@services/appsyncClient");
+          const userNotifications = await queries.getUserNotifications();
+          setNotifications(userNotifications);
+        } catch (error) {
+          // No notifications or error fetching
+          setNotifications([]);
+        }
       }
       setLoading(false);
     };

@@ -58,7 +58,6 @@ export const loadFeed = async (feedId: string = "GLOBAL") => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to load feed";
     errorStore.set(errorMessage);
-    console.error("Load feed error:", error);
   } finally {
     isLoadingStore.set(false);
   }
@@ -91,7 +90,6 @@ export const createPost = async (input: {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to create post";
     errorStore.set(errorMessage);
-    console.error("Create post error:", error);
     throw error;
   } finally {
     isLoadingStore.set(false);
@@ -138,7 +136,6 @@ export const savePost = async (input: {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to save post";
     errorStore.set(errorMessage);
-    console.error("Save post error:", error);
 
     // Rollback optimistic insert on error
     postsStore.set(postsStore.get().filter((p) => !p.id.startsWith("temp-")));
@@ -156,7 +153,6 @@ export const loadComments = async (postId: string) => {
     commentsStore.set(comments);
     return comments;
   } catch (error) {
-    console.error("Load comments error:", error);
     throw error;
   }
 };
@@ -179,7 +175,6 @@ export const addComment = async (postId: string, body: string) => {
 
     return newComment;
   } catch (error) {
-    console.error("Add comment error:", error);
     throw error;
   }
 };
@@ -216,7 +211,6 @@ export const toggleLike = async (postId: string) => {
       );
     }
   } catch (error) {
-    console.error("Toggle like error:", error);
     throw error;
   }
 };
@@ -231,8 +225,6 @@ export const subscribeToFeed = async (feedId: string = "GLOBAL") => {
   }
 
   const handle = await subscriptions.onFeedEvent(feedId, (event) => {
-    console.log("Feed event received:", event);
-
     switch (event.type) {
       case "POST_CREATED":
       case "POST_UPDATED":

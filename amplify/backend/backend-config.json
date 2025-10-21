@@ -5,11 +5,10 @@
                 "authConfig": {
                     "additionalAuthenticationProviders": [],
                     "defaultAuthentication": {
-                        "apiKeyConfig": {
-                            "apiKeyExpirationDays": 7,
-                            "description": "api key description"
-                        },
-                        "authenticationType": "API_KEY"
+                        "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+                        "userPoolConfig": {
+                            "userPoolId": "eu-west-2_boO0PSf3X"
+                        }
                     }
                 }
             },

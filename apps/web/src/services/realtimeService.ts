@@ -53,13 +53,11 @@ export const realtimeOperations = {
 
       isConnectedStore.set(true);
       connectionErrorStore.set(null);
-      console.log(`Connected to real-time feed: ${feedId}`);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to connect to real-time feed";
       connectionErrorStore.set(errorMessage);
       isConnectedStore.set(false);
-      console.error("Real-time connection error:", error);
     }
   },
 
@@ -69,12 +67,9 @@ export const realtimeOperations = {
       currentSubscription = null;
     }
     isConnectedStore.set(false);
-    console.log("Disconnected from real-time feed");
   },
 
   handleFeedEvent(event: FeedEvent) {
-    console.log("Real-time event received:", event);
-
     // Here you would typically update your stores based on the event type
     // For example:
     // - POST_CREATED: Add new post to posts store
@@ -116,7 +111,6 @@ export const realtimeOperations = {
     // Start simulation
     setTimeout(simulateRandomEvent, 5000); // Start after 5 seconds
     isConnectedStore.set(true);
-    console.log("Demo mode: Real-time simulation started");
   },
 };
 

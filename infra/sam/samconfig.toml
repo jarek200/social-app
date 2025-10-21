@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "social-app-backend"
+s3_bucket = "social-app-sam-artifacts-eu-west-2"
+s3_prefix = "social-app-backend"
+region = "eu-west-2"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "AppSyncApiId=5m7pbhxsqffrvp5binqipcyu5e"
+image_repositories = []

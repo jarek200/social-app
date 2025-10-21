@@ -33,12 +33,6 @@ const amplifyConfig = {
 // Only configure Amplify if we have the required environment variables
 if (envConfig.apiUrl && envConfig.cognitoUserPoolId) {
   Amplify.configure(amplifyConfig);
-
-  if (envConfig.debugMode) {
-    console.log("🔧 Amplify configured for environment:", envConfig.environment);
-  }
-} else {
-  console.warn("⚠️ Amplify not configured - missing required environment variables");
 }
 
 export { amplifyConfig, envConfig };

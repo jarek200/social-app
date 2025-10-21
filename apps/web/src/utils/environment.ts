@@ -273,10 +273,6 @@ const isValidUrl = (url: string): boolean => {
 export const handleEnvironmentError = (error: Error, context: string) => {
   const config = getEnvironmentConfig();
 
-  if (config.debugMode) {
-    console.error(`[${config.environment}] ${context}:`, error);
-  }
-
   if (config.features.errorReporting && !config.isDevelopment) {
     // Send to error reporting service
     // Example: Sentry.captureException(error, { tags: { environment: config.environment } });
@@ -311,22 +307,9 @@ export const initializeEnvironment = (): EnvironmentConfig => {
   const validation = validateEnvironment();
 
   if (!validation.isValid) {
-    console.error("Environment validation failed:", validation.errors);
-
     if (config.isProduction) {
       throw new Error(`Environment validation failed: ${validation.errors.join(", ")}`);
     }
-  }
-
-  // Log environment info in non-production
-  if (!config.isProduction) {
-    console.log("🌍 Environment Configuration:", {
-      environment: config.environment,
-      region: config.region,
-      demoMode: config.demoMode,
-      debugMode: config.debugMode,
-      features: config.features,
-    });
   }
 
   return config;

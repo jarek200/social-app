@@ -1,0 +1,259 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Lambda function for SavePostWorkflowTrigger",
+    "Parameters": {
+        "CloudWatchRule": {
+            "Type": "String",
+            "Default": "NONE"
+        },
+        "env": {
+            "Type": "String"
+        },
+        "SAVE_POST_STATE_MACHINE_ARN": {
+            "Type": "String",
+            "Default": "arn:aws:states:eu-west-2:459230935649:stateMachine:social-app-backend-save-post"
+        },
+        "FEED_TOPIC_ARN": {
+            "Type": "String",
+            "Default": "arn:aws:sns:eu-west-2:459230935649:social-app-backend-feed-events"
+        },
+        "APPSYNC_API_ID": {
+            "Type": "String",
+            "Default": "5m7pbhxsqffrvp5binqipcyu5e"
+        }
+    },
+    "Conditions": {
+        "ShouldNotCreateEnvResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "env"
+                },
+                "NONE"
+            ]
+        }
+    },
+    "Resources": {
+        "LambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Metadata": {
+                "aws:asset:path": "./src",
+                "aws:asset:property": "Code"
+            },
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "DeploymentBucket"
+                    },
+                    "S3Key": {
+                        "Ref": "s3Key"
+                    }
+                },
+                "Handler": "index.handler",
+                "FunctionName": {
+                    "Fn::If": [
+                        "ShouldNotCreateEnvResources",
+                        "SavePostWorkflowTrigger",
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "SavePostWorkflowTrigger",
+                                    "-",
+                                    {
+                                        "Ref": "env"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                },
+                "Environment": {
+                    "Variables": {
+                        "ENV": {
+                            "Ref": "env"
+                        },
+                        "REGION": {
+                            "Ref": "AWS::Region"
+                        },
+                        "SAVE_POST_STATE_MACHINE_ARN": {
+                            "Ref": "SAVE_POST_STATE_MACHINE_ARN"
+                        },
+                        "FEED_TOPIC_ARN": {
+                            "Ref": "FEED_TOPIC_ARN"
+                        },
+                        "APPSYNC_API_ID": {
+                            "Ref": "APPSYNC_API_ID"
+                        }
+                    }
+                },
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaExecutionRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "nodejs18.x",
+                "Layers": [],
+                "Timeout": 25
+            }
+        },
+        "LambdaExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::If": [
+                        "ShouldNotCreateEnvResources",
+                        "amplify-socialapp-sandbox-78075-save-post-workflow-trigger",
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "amplify-socialapp-sandbox-78075-save-post-workflow-trigger",
+                                    "-",
+                                    {
+                                        "Ref": "env"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "LambdaExecutionPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": {
+                                        "Fn::Sub": [
+                                            "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                                            {
+                                                "region": {
+                                                    "Ref": "AWS::Region"
+                                                },
+                                                "account": {
+                                                    "Ref": "AWS::AccountId"
+                                                },
+                                                "lambda": {
+                                                    "Ref": "LambdaFunction"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "states:StartExecution"
+                                    ],
+                                    "Resource": {
+                                        "Ref": "SAVE_POST_STATE_MACHINE_ARN"
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "sns:Publish"
+                                    ],
+                                    "Resource": {
+                                        "Ref": "FEED_TOPIC_ARN"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "LambdaLayerVersion": {
+            "Type": "AWS::Lambda::LayerVersion",
+            "Metadata": {
+                "aws:asset:path": "./opt",
+                "aws:asset:property": "Content"
+            },
+            "Properties": {
+                "LayerName": {
+                    "Fn::If": [
+                        "ShouldNotCreateEnvResources",
+                        "amplify-socialapp-sandbox-78075-save-post-workflow-trigger-layer",
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "amplify-socialapp-sandbox-78075-save-post-workflow-trigger-layer",
+                                    "-",
+                                    {
+                                        "Ref": "env"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                },
+                "Content": {
+                    "S3Bucket": {
+                        "Ref": "DeploymentBucket"
+                    },
+                    "S3Key": {
+                        "Ref": "s3Key"
+                    }
+                },
+                "CompatibleRuntimes": [
+                    "nodejs18.x"
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "Name": {
+            "Value": {
+                "Ref": "LambdaFunction"
+            },
+            "Description": "Name of the Lambda function"
+        },
+        "Arn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "LambdaFunction",
+                    "Arn"
+                ]
+            },
+            "Description": "ARN of the Lambda function"
+        },
+        "Region": {
+            "Value": {
+                "Ref": "AWS::Region"
+            },
+            "Description": "CloudWatch region"
+        },
+        "LambdaExecutionRole": {
+            "Value": {
+                "Ref": "LambdaExecutionRole"
+            },
+            "Description": "Lambda execution role"
+        }
+    }
+}

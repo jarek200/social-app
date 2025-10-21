@@ -13,11 +13,7 @@ export function AppInitializer() {
 
         // Initialize data services
         await initializeData();
-
-        console.log("✅ App initialized successfully");
-      } catch (error) {
-        console.error("❌ App initialization failed:", error);
-      }
+      } catch (error) {}
     };
 
     initApp();

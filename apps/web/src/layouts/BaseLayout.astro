@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { AppInitializer } from "../components/AppInitializer";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import PrimaryNav from "../components/PrimaryNav.astro";
 
 const {
@@ -23,9 +24,11 @@ const {
   </head>
   <body class="min-h-screen bg-slate-950 text-slate-100">
     <AppInitializer client:load />
-    <main class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12">
-      {_showNav && <PrimaryNav />}
-      <slot />
-    </main>
+    <ErrorBoundary client:load>
+      <main class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12">
+        {_showNav && <PrimaryNav />}
+        <slot />
+      </main>
+    </ErrorBoundary>
   </body>
 </html>

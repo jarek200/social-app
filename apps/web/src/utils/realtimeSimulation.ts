@@ -42,7 +42,6 @@ export const startRealtimeSimulation = () => {
   if (isRunning) return;
 
   isRunning = true;
-  console.log("🎯 Starting real-time simulation...");
 
   // Simulate new post every 30-60 seconds
   const postInterval = setInterval(
@@ -76,8 +75,6 @@ export const startRealtimeSimulation = () => {
 
       // Send browser notification
       notifyNewPost(randomAuthor.name, randomCaption);
-
-      console.log(`📝 New post: ${randomAuthor.name} - ${randomCaption}`);
     },
     30000 + Math.random() * 30000,
   ); // 30-60 seconds
@@ -93,7 +90,6 @@ export const startRealtimeSimulation = () => {
       if (!randomPost.likedByViewer && Math.random() > 0.7) {
         toggleLike(randomPost.id);
         notifyNewLike("Someone", randomPost.caption);
-        console.log(`❤️ New like on: ${randomPost.caption.slice(0, 30)}...`);
       }
     },
     15000 + Math.random() * 15000,
@@ -112,8 +108,6 @@ export const startRealtimeSimulation = () => {
 
       addComment(randomPost.id, randomComment);
       notifyNewComment(commenterName, randomComment);
-
-      console.log(`💬 New comment: ${commenterName} - ${randomComment}`);
     },
     45000 + Math.random() * 45000,
   ); // 45-90 seconds
@@ -148,8 +142,6 @@ export const startRealtimeSimulation = () => {
 
       const currentMessages = chatMessagesStore.get();
       chatMessagesStore.set([...currentMessages, newMessage]);
-
-      console.log(`💬 Chat: ${randomSender} - ${randomMessage}`);
     },
     20000 + Math.random() * 20000,
   ); // 20-40 seconds
@@ -166,7 +158,6 @@ export const stopRealtimeSimulation = () => {
   }
   intervalHandles = [];
   isRunning = false;
-  console.log("🛑 Stopped real-time simulation");
 };
 
 export const isSimulationRunning = () => isRunning;

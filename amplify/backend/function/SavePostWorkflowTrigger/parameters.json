@@ -1,0 +1,5 @@
+{
+    "SAVE_POST_STATE_MACHINE_ARN": "arn:aws:states:eu-west-2:459230935649:stateMachine:social-app-backend-save-post",
+    "FEED_TOPIC_ARN": "arn:aws:sns:eu-west-2:459230935649:social-app-backend-feed-events",
+    "APPSYNC_API_ID": "5m7pbhxsqffrvp5binqipcyu5e"
+}

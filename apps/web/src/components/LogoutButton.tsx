@@ -23,7 +23,6 @@ export function LogoutButton() {
       // Redirect to auth page
       window.location.href = "/auth";
     } catch (error) {
-      console.error("Logout failed:", error);
       alert("Sign out failed. Please try again.");
     } finally {
       setIsLoading(false);
